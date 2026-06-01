@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Wrench, Plus, X, CheckCircle, Clock, AlertTriangle, MapPin, Wifi, WifiOff } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
-import { usePayments } from '../hooks/usePayments';
-import { useTheme } from '../hooks/useTheme';
+import { useAuth } from '../../hooks/useAuth';
+import { usePayments } from '../../hooks/usePayments';
+import { useTheme } from '../../hooks/useTheme';
 
 type TicketStatus   = 'open' | 'in_progress' | 'resolved';
 type TicketPriority = 'low' | 'medium' | 'high';
