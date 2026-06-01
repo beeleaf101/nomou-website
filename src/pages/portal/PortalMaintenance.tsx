@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wrench, Plus, X, CheckCircle, Clock, AlertTriangle, MapPin, Wifi, WifiOff, Battery } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
-import { usePayments } from '../../hooks/usePayments';
-import { useTheme } from '../../hooks/useTheme';
+import { Wrench, Plus, X, CheckCircle, Clock, AlertTriangle, MapPin, Wifi, WifiOff } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
+import { usePayments } from '../hooks/usePayments';
+import { useTheme } from '../hooks/useTheme';
 
 type TicketStatus   = 'open' | 'in_progress' | 'resolved';
 type TicketPriority = 'low' | 'medium' | 'high';
@@ -130,7 +130,7 @@ export default function PortalMaintenance() {
   if (!user) return null;
 
   // Plan gate — standard users can't submit maintenance
-  const canSubmit = user.plan !== 'standard';
+  const canSubmit = user.plan !== 'bronze';
 
   return (
     <div className="p-4 sm:p-6 space-y-5">
