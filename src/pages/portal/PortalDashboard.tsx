@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Droplets, Wind, CloudRain, Thermometer, Wifi, WifiOff, AlertTriangle,
+  Droplets, CloudRain, Thermometer, Wifi, WifiOff, AlertTriangle,
   ArrowUpRight, Map, FileBarChart2, Wrench, Plus, X, CheckCircle, Clock,
   CreditCard, Activity, Sun, TrendingUp, TrendingDown, Zap
 } from 'lucide-react';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, RadialBarChart, RadialBar } from 'recharts';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip} from 'recharts';
 import { useAuth } from '../../hooks/useAuth';
 import { usePayments } from '../../hooks/usePayments';
 import { useTheme } from '../../hooks/useTheme';

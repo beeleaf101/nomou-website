@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { CreditCard, CheckCircle, Clock, AlertTriangle, Download, Receipt, Wifi, ChevronDown } from 'lucide-react';
-import { usePayments, type Payment } from '../../hooks/usePayments';
+import { motion } from 'framer-motion';
+import { CreditCard, CheckCircle, Clock, AlertTriangle, Download, Receipt, Wifi} from 'lucide-react';
+import { usePayments } from '../../hooks/usePayments';
 import { useTheme } from '../../hooks/useTheme';
 
 const tabs = ['All', 'Subscription', 'Node', 'Unpaid'] as const;

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion} from 'framer-motion';
 import {
-  Crown, Sparkles, TrendingUp, TrendingDown, AlertTriangle, CheckCircle,
+  Crown, Sparkles, CheckCircle,
   Droplets, Thermometer, Wind, Sun, Leaf, ArrowUpRight, RefreshCw, Lock
 } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, RadarChart, Radar, PolarGrid, PolarAngleAxis } from 'recharts';

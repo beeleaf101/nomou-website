@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FileBarChart2, Download, TrendingUp, Droplets, Wind, Thermometer, Sun, CheckCircle } from 'lucide-react';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area } from 'recharts';
+import { FileBarChart2, Download, Droplets, Wind, Thermometer, Sun, CheckCircle } from 'lucide-react';
+import { ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area } from 'recharts';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
 import { useArduinoData } from '../../hooks/useArduinoData';

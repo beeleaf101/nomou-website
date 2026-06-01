@@ -12,7 +12,7 @@ export default function PortalMap() {
   const statusColor: Record<string, string> = { online: '#4CAF50', offline: '#ef4444', warning: '#FF9800' };
   const StatusIcon: Record<string, React.ElementType> = { online: Wifi, offline: WifiOff, warning: AlertTriangle };
 
-  const selectedNode = user?.nodes.find(n => n.id === selected);
+  const _selectedNode = user?.nodes.find(n => n.id === selected);
 
   // Normalize lat/lng to % positions within the map card
   const nodes = user?.nodes ?? [];
