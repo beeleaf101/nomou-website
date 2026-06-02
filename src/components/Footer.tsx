@@ -94,8 +94,8 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3">
               {[
-                { icon: Mail, val: 'info@nomou.io' },
-                { icon: Phone, val: '+965 1234 5678' },
+                { icon: Mail, val: 'nomouQ8@gmail.com' },
+                { icon: Phone, val: '+965 94448134' },
                 { icon: MapPin, val: 'Kuwait City, Kuwait' },
               ].map((item) => {
                 const Icon = item.icon;

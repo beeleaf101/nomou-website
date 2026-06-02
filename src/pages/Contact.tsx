@@ -6,8 +6,8 @@ import ScrollReveal from '../components/ScrollReveal';
 import { useTheme } from '../hooks/useTheme';
 
 const contactInfo = [
-  { icon: Mail, label: 'Email', value: 'info@nomou.io', href: 'mailto:info@nomou.io' },
-  { icon: Phone, label: 'Phone', value: '+965 1234 5678', href: 'tel:+96512345678' },
+  { icon: Mail, label: 'Email', value: 'nomouQ8@gmail.com', href: 'mailto:info@nomou.io' },
+  { icon: Phone, label: 'Phone', value: '+965 94448134', href: 'tel:+96512345678' },
   { icon: MapPin, label: 'Address', value: 'Kuwait City, State of Kuwait', href: '#' },
   { icon: Clock, label: 'Hours', value: 'Sun - Thu: 8:00 AM - 5:00 PM', href: '#' },
 ];
