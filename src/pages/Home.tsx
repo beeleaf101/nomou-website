@@ -67,15 +67,14 @@ const features: FeatureItem[] = [
   { icon: Cpu, title: 'Edge Intelligence', desc: 'On-device processing filters noise and sends only actionable insights to the cloud', color: '#1B5E20' },
   { icon: Gauge, title: 'Predictive Analytics', desc: 'AI-powered forecasting helps you irrigate before your crops show stress', color: '#2D7A3E' },
 ];
-const { current: arduino } = useArduinoData();
 
-const metrics = [
-  { label: 'Soil Moisture', icon: Droplets,    color: '#03A9F4', value: arduino.soil_pct,   suffix: '%',    status: arduino.soil_cat,    decimals: 0 },
-  { label: 'Air Quality',   icon: Wind,        color: '#4CAF50', value: arduino.aqi,         suffix: ' AQI', status: arduino.aqi_cat,     decimals: 0 },
-  { label: 'Temperature',   icon: Thermometer, color: '#FF9800', value: arduino.temperature, suffix: '°C',   status: arduino.temperature > 37 ? 'High' : arduino.temperature > 33 ? 'Warm' : 'Normal', decimals: 1 },
-  { label: 'Humidity',      icon: CloudRain,   color: '#4CAF50', value: arduino.humidity,    suffix: '%',    status: arduino.humidity_cat, decimals: 0 },
-  { label: 'Light Level',   icon: TrendingUp,  color: '#9C27B0', value: arduino.light_pct,   suffix: '%',    status: arduino.light_cat,   decimals: 0 },
-];
+// const metrics: MetricItem[] = [
+//   { label: 'Soil Moisture', icon: Droplets, color: '#03A9F4', value: 28, suffix: '%', status: 'Optimal' },
+//   { label: 'Air Quality', icon: Wind, color: '#4CAF50', value: 42, suffix: ' AQI', status: 'Good' },
+//   { label: 'Water pH', icon: CloudRain, color: '#03A9F4', value: 7.24, suffix: '', status: 'Good', decimals: 2 },
+//   { label: 'Temperature', icon: Thermometer, color: '#FF9800', value: 31.2, suffix: '°C', status: 'Normal', decimals: 1 },
+//   { label: 'Humidity', icon: CloudRain, color: '#4CAF50', value: 64, suffix: '%', status: 'Normal' },
+// ];
 
 const chartData = Array.from({ length: 24 }, (_, idx) => ({
   time: `${idx}:00`,
@@ -130,7 +129,15 @@ function ScrambleText({ text, className, delay = 0 }: { text: string; className?
 export default function Home() {
   const { isDark } = useTheme();
   const { isLoggedIn } = useAuth();
+  const { current: arduino } = useArduinoData();
 
+  const metrics = [
+    { label: 'Soil Moisture', icon: Droplets,    color: '#03A9F4', value: arduino.soil_pct,   suffix: '%',    status: arduino.soil_cat    },
+    { label: 'Air Quality',   icon: Wind,        color: '#4CAF50', value: arduino.aqi,         suffix: ' AQI', status: arduino.aqi_cat     },
+    { label: 'Temperature',   icon: Thermometer, color: '#FF9800', value: arduino.temperature, suffix: '°C',   status: arduino.temperature > 37 ? 'High' : 'Normal' },
+    { label: 'Humidity',      icon: CloudRain,   color: '#4CAF50', value: arduino.humidity,    suffix: '%',    status: arduino.humidity_cat },
+    { label: 'Light Level',   icon: TrendingUp,  color: '#9C27B0', value: arduino.light_pct,   suffix: '%',    status: arduino.light_cat   },
+  ];
   // Plain strings (no translation)
   const t = {
     badge: 'Smart Environmental Monitoring',
