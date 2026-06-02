@@ -88,7 +88,7 @@ export default function Dashboard() {
   // Build live metrics from real Arduino data
   const allMetrics = [
     { label: 'Soil Moisture', value: current.soil_pct,    suffix: '%',   icon: Droplets,     color: '#03A9F4', status: current.soil_cat },
-    { label: 'Air Quality',   value: 42,                  suffix: ' AQI',icon: Wind,         color: '#4CAF50', status: 'Good' },
+    { label: 'Air Quality',   value: current.aqi, status: current.aqi_cat, suffix: ' AQI',icon: Wind, color: '#4CAF50'},
     { label: 'Temperature',   value: current.temperature, suffix: '°C',  decimals: 1, icon: Thermometer, color: '#FF9800', status: '' },
     { label: 'Humidity',      value: current.humidity,    suffix: '%',   icon: CloudRain,    color: '#4CAF50', status: current.humidity_cat },
     { label: 'Light Level',   value: current.light_pct,   suffix: '%',   icon: TrendingUp,   color: '#9C27B0', status: current.light_cat },
