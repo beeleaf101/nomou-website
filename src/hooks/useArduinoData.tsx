@@ -1,10 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 
-// When running locally (npm run dev), Vite proxies /arduino/* → 192.168.8.196
-// When using ngrok, set VITE_ARDUINO_URL=https://your-ngrok-url in .env
-const ARDUINO_BASE = import.meta.env.VITE_ARDUINO_URL
+// Locally: uses Vite proxy /arduino → 192.168.8.196
+// On Vercel: uses /api/arduino proxy function (no CORS issues)
+const IS_DEV = import.meta.env.DEV;
+const ARDUINO_DIRECT = import.meta.env.VITE_ARDUINO_URL
   ? String(import.meta.env.VITE_ARDUINO_URL)
-  : '/arduino';  // uses Vite proxy → no CORS issues locally
+  : null;
+
+function getUrl(path: string) {
+  if (ARDUINO_DIRECT) return `${ARDUINO_DIRECT}${path}`;
+  if (IS_DEV) return `/arduino${path}`;
+  return `/api/arduino?path=${path}`;
+}
 
 export interface SensorCurrent {
   temperature: number;
@@ -46,7 +53,7 @@ export function useArduinoData() {
 
   const fetchCurrent = async () => {
     try {
-      const res = await fetch(`${ARDUINO_BASE}/api/current`, {
+      const res = await fetch(getUrl('/api/current'), {
         signal: AbortSignal.timeout(4000),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -64,7 +71,7 @@ export function useArduinoData() {
       });
       setError(null);
       setLoading(false);
-    } catch (e) {
+    } catch {
       setError('Node offline or unreachable');
       setCurrent(prev => ({ ...prev, online: false }));
       setLoading(false);
@@ -73,7 +80,7 @@ export function useArduinoData() {
 
   const fetchHistory = async () => {
     try {
-      const res = await fetch(`${ARDUINO_BASE}/api/history`, {
+      const res = await fetch(getUrl('/api/history'), {
         signal: AbortSignal.timeout(4000),
       });
       if (!res.ok) return;
@@ -91,7 +98,6 @@ export function useArduinoData() {
   useEffect(() => {
     fetchCurrent();
     fetchHistory();
-    // Poll current every 2s, history every 30s
     intervalRef.current     = setInterval(fetchCurrent, 2000);
     histIntervalRef.current = setInterval(fetchHistory, 30000);
     return () => {

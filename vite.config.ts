@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/arduino': {
-        target: ' https://sacrifice-substance-homeland-released.trycloudflare.com',
+        target: 'https://corpus-jpeg-coordinate-qualified.trycloudflare.com',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/arduino/, ''),
