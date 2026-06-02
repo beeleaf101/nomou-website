@@ -230,6 +230,7 @@ export default function Pricing() {
                     <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                       onClick={() => handleSelect(plan.id)}
                       disabled={isCurrent}
+                      style={plan.id === 'gold' && !isCurrent ? { background: 'linear-gradient(to right, #F59E0B, #D97706)', color: 'white' } : {}}
                       className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
                         isCurrent
                           ? 'bg-green-primary/20 text-green-primary border border-green-primary/30 cursor-default'
@@ -238,7 +239,7 @@ export default function Pricing() {
                             : plan.highlight
                               ? 'bg-gradient-to-r from-green-primary to-green-light text-white hover:shadow-lg hover:shadow-green-primary/30'
                               : plan.id === 'gold'
-                                ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-white hover:shadow-lg hover:shadow-amber-500/30'
+                                ? 'hover:shadow-lg'
                                 : isDark
                                   ? 'bg-white/10 text-white hover:bg-white/20 border border-white/10'
                                   : 'bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-200'
