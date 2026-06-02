@@ -8,125 +8,100 @@ import ScrollReveal from '../components/ScrollReveal';
 const plans = [
   {
     id: 'trial',
-    name: '14-Day Free Trial',
-    price: 'KD 0',
-    period: '14 days',
-    desc: 'Full Gold access free for 14 days. No credit card required.',
+    name: 'One-Time Visit',
+    price: '35 KWD',
+    period: 'per visit',
+    desc: 'One-time soil check with no subscription needed.',
     icon: Gift,
     color: '#8BC34A',
-    badge: 'New Users',
+    badge: null,
     highlight: false,
-    nodes: 'Unlimited nodes',
+    nodes: 'No subscription needed',
     nodePrice: null,
-    testing: 'Full Gold features included',
+    testing: 'One-time assessment',
     features: [
-      'Unlimited sensor nodes',
-      'Full live dashboard',
-      'Unlimited data history',
-      'Daily, weekly & custom reports',
-      'Advanced node map + zones',
-      'Priority maintenance',
-      'Full API access',
-      'AI recommendations & predictions',
-      'Dedicated account manager',
-      'Free testing up to 30,000 m²',
-      'All Gold features included',
+      'One-time soil check',
+      'Multiple spot readings',
+      'AI report in 24 hours',
+      'No subscription needed',
     ],
     notIncluded: [],
   },
   {
     id: 'bronze',
-    name: 'Bronze',
-    price: 'KD 15',
-    period: 'per month',
-    desc: 'For small farms getting started with smart monitoring.',
+    name: 'Basic',
+    price: 'KWD 110',
+    period: 'setup + KWD 20/month',
+    desc: 'For small farms, gardens and customers who want affordable monitoring.',
     icon: Cpu,
     color: '#CD7F32',
     badge: null,
     highlight: false,
-    nodes: 'Pay per node — KD 50/node',
-    nodePrice: 'KD 50 per node',
-    testing: '50 fils/m² (first 5,000 m²)\nthen 25 fils/m² onwards',
+    nodes: 'Basic monitoring',
+    nodePrice: 'KWD 110 setup',
+    testing: 'Monthly soil readings',
     features: [
-      'Live dashboard',
-      '30-day data history',
-      'Monthly PDF reports',
-      'Node map view',
-      'Email & chat support',
-      'Basic alerts',
-      '50 fils/m² tested (first 5,000 m²)',
-      '25 fils/m² tested subsequently',
-      'KD 50 per node',
+      'Monthly soil readings',
+      'Basic dashboard access',
+      'Email alerts',
+      'Standard reports',
     ],
     notIncluded: [
-      'Weekly reports',
-      'Maintenance requests',
-      'Custom alerts & thresholds',
-      'API access',
       'AI recommendations',
+      'Mobile app access',
       'Priority support',
+      'Full API access',
     ],
   },
   {
     id: 'silver',
-    name: 'Silver',
-    price: 'KD 25',
-    period: 'per month',
-    desc: 'For serious farmers who need full visibility and control.',
+    name: 'Smart',
+    price: 'KWD 270',
+    period: 'setup + KWD 45/month',
+    desc: 'For greenhouses and farms that need more sensors and better alerts.',
     icon: Star,
-    color: '#9E9E9E',
-    badge: 'Most Popular',
+    color: '#2D7A3E',
+    badge: 'Popular',
     highlight: true,
-    nodes: 'Pay per node — KD 50/node',
-    nodePrice: 'KD 50 per node',
-    testing: '25 fils/m² tested (flat rate)',
+    nodes: 'Smart monitoring',
+    nodePrice: 'KWD 270 setup',
+    testing: 'Real-time monitoring',
     features: [
-      'Full live dashboard',
-      '1-year data history',
-      'Weekly & monthly reports',
-      'Interactive node map',
-      'Maintenance request system',
-      'Custom alerts & thresholds',
+      'Real-time monitoring',
+      'AI recommendations',
+      'Mobile app access',
       'Priority support',
-      'Export to CSV & PDF',
-      '25 fils/m² tested (flat rate)',
-      'KD 50 per node',
     ],
     notIncluded: [
-      'API access',
-      'AI recommendations',
-      'Unlimited nodes',
+      'Full API access',
+      'Custom reporting',
+      'Multi-site deployment',
     ],
   },
   {
     id: 'gold',
-    name: 'Gold',
-    price: 'KD 45',
-    period: 'per month',
-    desc: 'Enterprise-grade for large farms and agri-businesses.',
+    name: 'Institutional',
+    price: 'KWD 340',
+    period: 'setup + KWD 150/month',
+    desc: 'For universities, public projects, large farms and sustainability pilots.',
     icon: Crown,
     color: '#FF9800',
     badge: null,
     highlight: false,
-    nodes: 'Unlimited nodes included',
-    nodePrice: 'Included',
-    testing: 'Free up to 30,000 m²\nthen 25 fils/m² subsequently',
+    nodes: 'Full institutional access',
+    nodePrice: 'KWD 340 setup',
+    testing: 'Full-scale deployment',
     features: [
-      'Unlimited sensor nodes (included)',
-      'Full live dashboard',
-      'Unlimited data history',
-      'Daily, weekly & custom reports',
-      'Advanced node map + zones',
-      'Priority maintenance',
       'Full API access',
-      'AI recommendations & predictions',
+      'Custom reporting',
+      'Multi-site deployment',
       'Dedicated account manager',
-      'Free testing up to 30,000 m²',
-      '25 fils/m² tested subsequently',
     ],
     notIncluded: [],
   },
 ];
+
+// old plans placeholder
 
 export default function Pricing() {
   const { user, isLoggedIn } = useAuth();
@@ -280,6 +255,22 @@ export default function Pricing() {
         {/* Service-Based Offerings */}
         <ScrollReveal>
           <div className={`rounded-3xl p-8 border mb-10 ${isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-100 shadow-sm'}`}>
+            <h3 className={`text-xl font-black mb-2 ${isDark ? 'text-white' : 'text-[#0a120e]'}`}>Soil Intelligence Services</h3>
+            <p className={`text-sm mb-6 ${isDark ? 'text-white/40' : 'text-gray-500'}`}>Nomou offers a range of soil intelligence services tailored to different client needs, from one-time assessments to continuous smart monitoring with AI-powered recommendations.</p>
+            <div className="space-y-3 mb-8">
+              {[
+                { title: 'Soil Insight Visit', desc: 'One-time field assessment with sensor deployment and basic soil health report.' },
+                { title: 'Basic Monitoring', desc: 'Monthly sensor readings with standard soil parameter tracking and alerts.' },
+                { title: 'Smart Monitoring', desc: 'Continuous real-time monitoring with AI analysis and personalized recommendations.' },
+                { title: 'Institutional Package', desc: 'Full-scale deployment for research institutions with API access and custom reporting.' },
+                { title: 'Consultation Service', desc: 'Expert agricultural consultation based on Nomou data insights.' },
+              ].map(s => (
+                <div key={s.title} className="flex items-start gap-3">
+                  <span className="w-3 h-3 rounded-full bg-green-primary mt-1 shrink-0" />
+                  <p className={`text-sm ${isDark ? 'text-white/70' : 'text-gray-700'}`}><strong>{s.title}</strong> - {s.desc}</p>
+                </div>
+              ))}
+            </div>
             <h3 className={`text-xl font-black mb-6 ${isDark ? 'text-white' : 'text-[#0a120e]'}`}>Service-Based Offerings</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className={`rounded-2xl p-5 border ${isDark ? 'bg-white/5 border-white/10' : 'bg-pale-green border-green-primary/10'}`}>
@@ -313,25 +304,23 @@ export default function Pricing() {
                 <thead>
                   <tr className={`border-b ${isDark ? 'border-white/10' : 'border-gray-100'}`}>
                     <th className={`text-left py-3 px-6 ${isDark ? 'text-white/40' : 'text-gray-500'}`}>Feature</th>
-                    {['Trial','Bronze','Silver','Gold'].map(p => (
+                    {['One-Time','Basic','Smart','Institutional'].map(p => (
                       <th key={p} className={`text-center py-3 px-4 font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{p}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {[
-                    ['Monthly Price',         'Free',      'KD 15',        'KD 25',         'KD 45'],
-                    ['Node Price',            'Included',  'KD 50/node',   'KD 50/node',    'Included'],
-                    ['Nodes',                 'Unlimited', 'Pay per node', 'Pay per node',  'Unlimited'],
-                    ['Data History',          'Unlimited', '30 days',      '1 year',        'Unlimited'],
-                    ['Reports',               '✓',        'Monthly',      'Weekly+Monthly','Daily+Custom'],
-                    ['Maintenance Requests',  '✓',        '✗',           '✓',            '✓'],
-                    ['Custom Alerts',         '✓',        '✗',           '✓',            '✓'],
-                    ['API Access',            '✓',        '✗',           '✗',            '✓'],
-                    ['AI Recommendations',    '✓',        '✗',           '✗',            '✓'],
-                    ['Testing — first tier',  '50 fils/m²','50 fils/m²',  '25 fils/m²',   'Free (0–30k m²)'],
-                    ['Testing — subsequent',  '25 fils/m²','25 fils/m²',  '25 fils/m²',   '25 fils/m²'],
-                    ['Support',               'Dedicated', 'Email+Chat',  'Priority',      'Dedicated Manager'],
+                    ['Package',           'One-Time Visit',  'Basic Monitoring', 'Smart Monitoring', 'Institutional'],
+                    ['Setup Charge',      '—',               'KWD 110',          'KWD 270',          'KWD 340'],
+                    ['Monthly Sub',       '35 KWD/visit',    'KWD 20',           'KWD 45',           'KWD 150'],
+                    ['Best For',          'One-off check',   'Small farms',      'Greenhouses',      'Universities'],
+                    ['AI Recommendations','✗',              '✗',               '✓',               '✓'],
+                    ['Mobile App',        '✗',              '✗',               '✓',               '✓'],
+                    ['API Access',        '✗',              '✗',               '✗',               '✓'],
+                    ['Custom Reporting',  '✗',              '✗',               '✗',               '✓'],
+                    ['Multi-site',        '✗',              '✗',               '✗',               '✓'],
+                    ['Support',           '—',              'Email',            'Priority',         'Dedicated'],
                   ].map(([feat, ...vals]) => (
                     <tr key={feat as string} className={`border-b ${isDark ? 'border-white/5' : 'border-gray-50'}`}>
                       <td className={`py-3 px-6 font-medium ${isDark ? 'text-white/70' : 'text-gray-700'}`}>{feat}</td>
