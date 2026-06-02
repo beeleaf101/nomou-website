@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import {
   ArrowRight, Eye, TrendingUp, ChevronRight, Leaf, ArrowUpRight,
   Radio, Wifi, Battery, Shield, Cpu, Gauge, Droplets,
-  Wind, Thermometer, CloudRain, type LucideIcon,
+  Wind, Thermometer, CloudRain,
 } from 'lucide-react';
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -12,45 +12,13 @@ import {
 } from 'recharts';
 import ScrollReveal from '../components/ScrollReveal';
 import { useTheme } from '../hooks/useTheme';
-import { useAuth } from '../hooks/useAuth';
 import { useArduinoData } from '../hooks/useArduinoData';
-
-/* ------------------------------------------------------------------ */
-/*  TYPES                                                              */
-/* ------------------------------------------------------------------ */
-
-interface NodeItem {
-  level: string;
-  name: string;
-  tags: string;
-  image: string;
-  features: string[];
-  bestFor: string;
-  color: string;
-}
-
-interface FeatureItem {
-  icon: LucideIcon;
-  title: string;
-  desc: string;
-  color: string;
-}
-
-interface MetricItem {
-  label: string;
-  icon: LucideIcon;
-  color: string;
-  value: number;
-  suffix: string;
-  status: string;
-  decimals?: number;
-}
 
 /* ------------------------------------------------------------------ */
 /*  DATA                                                               */
 /* ------------------------------------------------------------------ */
 
-const nodes: NodeItem[] = [
+const nodes = [
   { level: '01', name: 'Prototype Node', tags: 'Learn. Build. Experiment.', image: '/images/node-prototype.png',
     features: ['ESP32 DevKit', 'Breadboard Setup', 'Basic Sensors', 'USB Powered'], bestFor: 'Students & Hobbyists', color: '#03A9F4' },
   { level: '02', name: 'Semi-Professional', tags: 'Field Test. Compete. Validate.', image: '/images/node-semipro.png',
@@ -59,7 +27,7 @@ const nodes: NodeItem[] = [
     features: ['All-in-One Design', 'Solar + Battery', 'LoRa / 4G / WiFi', '30+ Day Runtime'], bestFor: 'Commercial Agriculture', color: '#1B5E20' },
 ];
 
-const features: FeatureItem[] = [
+const features = [
   { icon: Radio, title: 'Real-time Monitoring', desc: 'Live data from soil, air, water & weather sensors streaming every 30 seconds', color: '#03A9F4' },
   { icon: Wifi, title: 'Multi-Protocol Connectivity', desc: 'WiFi, LoRa, 4G — your data reaches the cloud no matter where your fields are', color: '#4CAF50' },
   { icon: Battery, title: '30+ Day Battery Life', desc: 'Solar-ready ultra-low power design keeps nodes running in the remotest fields', color: '#FF9800' },
@@ -68,13 +36,7 @@ const features: FeatureItem[] = [
   { icon: Gauge, title: 'Predictive Analytics', desc: 'AI-powered forecasting helps you irrigate before your crops show stress', color: '#2D7A3E' },
 ];
 
-const metrics: MetricItem[] = [
-  { label: 'Soil Moisture', icon: Droplets, color: '#03A9F4', value: 28, suffix: '%', status: 'Optimal' },
-  { label: 'Air Quality', icon: Wind, color: '#4CAF50', value: current.aqi, status: current.aqi_cat, suffix: ' AQI'},
-  { label: 'Water pH', icon: CloudRain, color: '#03A9F4', value: 7.24, suffix: '', status: 'Good', decimals: 2 },
-  { label: 'Temperature', icon: Thermometer, color: '#FF9800', value: 31.2, suffix: '°C', status: 'Normal', decimals: 1 },
-  { label: 'Humidity', icon: CloudRain, color: '#4CAF50', value: 64, suffix: '%', status: 'Normal' },
-];
+// metrics defined inside component
 
 const chartData = Array.from({ length: 24 }, (_, idx) => ({
   time: `${idx}:00`,
@@ -128,162 +90,122 @@ function ScrambleText({ text, className, delay = 0 }: { text: string; className?
 
 export default function Home() {
   const { isDark } = useTheme();
-  const { isLoggedIn } = useAuth();
+  const { current: arduino } = useArduinoData();
 
-  // Plain strings (no translation)
-  const t = {
-    badge: 'Smart Environmental Monitoring',
-    headline1: 'Environmental Intelligence for',
-    headline2: 'Smarter Agriculture',
-    sub: 'Nomou is an IoT-based monitoring system that helps you track soil, air, and water conditions in real-time.',
-    btnNodes: 'Explore Our Nodes',
-    btnDashboard: 'View Live Dashboard',
-    badge1: 'Real-time Monitoring',
-    badge2: 'High Accuracy Smart Sensors',
-    badge3: 'Low Power Energy Efficient',
-    badge4: 'Scalable Multi-Node System',
-    badge5: 'Reliable All Weather',
-    scroll: 'Scroll',
-    hardwareBadge: 'Hardware',
-    hardwareTitle1: 'Built for',
-    hardwareTitle2: 'Every',
-    hardwareTitle3: 'Stage.',
-    viewDashboard: 'View Live Dashboard',
-  };
-
-  const tNodes = nodes;
-  const tFeatures = features;
-  const tMetrics = metrics;
+  const metrics = [
+    { label: 'Soil Moisture', icon: Droplets,    color: '#03A9F4', value: arduino.soil_pct,   suffix: '%',    status: arduino.soil_cat,    decimals: 0 },
+    { label: 'Air Quality',   icon: Wind,        color: '#4CAF50', value: arduino.aqi,         suffix: ' AQI', status: arduino.aqi_cat,     decimals: 0 },
+    { label: 'Temperature',   icon: Thermometer, color: '#FF9800', value: arduino.temperature, suffix: '°C',   status: arduino.temperature > 37 ? 'High' : arduino.temperature > 33 ? 'Warm' : 'Normal', decimals: 1 },
+    { label: 'Humidity',      icon: CloudRain,   color: '#4CAF50', value: arduino.humidity,    suffix: '%',    status: arduino.humidity_cat, decimals: 0 },
+    { label: 'Light Level',   icon: TrendingUp,  color: '#9C27B0', value: arduino.light_pct,   suffix: '%',    status: arduino.light_cat,   decimals: 0 },
+  ];
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, -120]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+  const heroTextY = useTransform(scrollYProgress, [0, 0.5], [0, -60]);
+  const nodesX = useSpring(useTransform(scrollYProgress, [0.15, 0.5], [0, -200]), { stiffness: 40, damping: 20 });
   return (
     <div className="overflow-x-hidden">
       {/* ═══════════════════════════════════════════════════════════ */}
       {/*  HERO                                                       */}
       {/* ═══════════════════════════════════════════════════════════ */}
-      <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden bg-[#0a120e]">
-        {/* Full-bleed background image */}
-        <div className="absolute inset-0">
-          <img
-            src="/images/hero-bg1.jpeg"
-            alt=""
-            className="w-full h-full object-contain object-center"
-            style={{ imageRendering: 'auto', filter: 'contrast(1.08) saturate(1.1)' }}
+      <section ref={heroRef} className={`relative min-h-[100dvh] flex items-end overflow-hidden transition-colors duration-500 ${
+        isDark ? 'bg-[#0a120e]' : 'bg-[#F7FAF7]'
+      }`}>
+        {/* Background */}
+        <motion.div style={{ y: heroY }} className="absolute inset-0 will-change-transform">
+          <div className="absolute inset-0 transition-opacity duration-500"
+            style={{
+              backgroundImage: isDark ? 'url(/images/data-flow.jpg)' : 'url(/images/hero-device-bg.png)',
+              opacity: isDark ? 0.4 : 1,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              imageRendering: 'auto',
+            }}
           />
-          {/* Subtle left-side overlay so text stays readable */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/65 via-white/15 to-transparent" />
-          {/* Bottom fade into next section */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a120e] to-transparent" />
-        </div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 0.6 }}
-        >
-          <span className="text-[10px] uppercase tracking-[0.2em] text-white/50 font-medium">{t.scroll}</span>
-          <motion.div
-            className="w-5 h-8 rounded-full border-2 border-white/30 flex items-start justify-center pt-1.5"
-            animate={{}}
-          >
-            <motion.div
-              className="w-1 h-1.5 rounded-full bg-white/60"
-              animate={{ y: [0, 10, 0], opacity: [1, 0, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-            />
-          </motion.div>
+          <div className={`absolute inset-0 transition-colors duration-500 ${
+            isDark
+              ? 'bg-gradient-to-t from-[#0a120e] via-[#0a120e]/60 to-transparent'
+              : 'bg-gradient-to-r from-[#F7FAF7]/95 via-[#F7FAF7]/50 to-transparent'
+          }`} />
+          {isDark && <div className="absolute inset-0 bg-gradient-to-r from-[#0a120e] via-transparent to-[#0a120e]/80" />}
         </motion.div>
 
+        {/* Particles - dark only */}
+        {isDark && [...Array(12)].map((_, i) => (
+          <motion.div key={i} className="absolute rounded-full"
+            style={{
+              width: 3 + Math.random() * 4,
+              height: 3 + Math.random() * 4,
+              left: `${5 + i * 8}%`,
+              top: `${10 + (i % 4) * 22}%`,
+              backgroundColor: i % 3 === 0 ? '#8BC34A' : i % 3 === 1 ? '#4CAF50' : '#03A9F4',
+              boxShadow: `0 0 ${6 + (i % 3) * 3}px currentColor`,
+            }}
+            animate={{ y: [0, -25, 0], opacity: [0.4, 0.85, 0.4] }}
+            transition={{ duration: 7 + Math.random() * 5, repeat: Infinity, delay: i * 0.6, ease: 'easeInOut' }}
+          />
+        ))}
+
         {/* Content */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-28 pb-0">
-          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-0">
+        <motion.div style={{ opacity: heroOpacity, y: heroTextY }}
+          className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 w-full pb-24 pt-32">
+          <div className="max-w-3xl">
+            <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 transition-colors duration-500 ${
+                isDark ? 'bg-green-primary/10 border border-green-primary/20' : 'bg-green-primary/10 border border-green-primary/20'
+              }`}>
+              <span className={`w-2 h-2 rounded-full animate-live-pulse ${isDark ? 'bg-green-light' : 'bg-green-primary'}`} />
+              <span className={`text-xs font-bold uppercase tracking-[0.2em] ${isDark ? 'text-green-light' : 'text-green-primary'}`}>
+                IoT Environmental Monitoring
+              </span>
+            </motion.div>
 
-            {/* ── Left: text ── */}
-            <div className="flex-1 max-w-xl">
-              {/* Badge */}
-              <motion.p
-                initial={{ opacity: 0, y: -12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="text-xs font-bold uppercase tracking-[0.25em] text-green-primary mb-4"
-              >
-                {t.badge}
-              </motion.p>
+            <motion.h1 initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.2 }}
+              className={`text-5xl sm:text-6xl lg:text-8xl font-black leading-[0.95] tracking-tight mb-6 transition-colors duration-500 ${isDark ? 'text-white' : 'text-[#0a120e]'}`}>
+              <span className="block">Monitor.</span>
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-lime via-green-light to-sky">Understand.</span>
+              <span className="block">Grow.</span>
+            </motion.h1>
 
-              {/* Headline */}
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.15 }}
-                className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight text-[#0a120e] mb-5"
-              >
-                {t.headline1}{' '}
-                <span className="text-green-primary">{t.headline2}</span>
-              </motion.h1>
+            <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.5 }}
+              className={`text-lg mb-10 max-w-lg leading-relaxed transition-colors duration-500 ${isDark ? 'text-white/40' : 'text-gray-500'}`}>
+              NOMOU connects your fields to the cloud. Real-time data from soil, air, and water — so you make smarter decisions, every day.
+            </motion.p>
 
-              {/* Sub */}
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.3 }}
-                className="text-base text-gray-500 leading-relaxed mb-8 max-w-md"
-              >
-                {t.sub}
-              </motion.p>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.7 }}
+              className="flex flex-wrap gap-4 mb-16">
+              <Link to="/nodes" className="group inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-green-primary to-green-light text-white font-bold rounded-2xl transition-all hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(76,175,80,0.5)] hover:from-[#388E3C] hover:to-[#66BB6A]">
+                Explore Nodes
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link to="/dashboard" className={`group inline-flex items-center gap-2 px-7 py-3.5 font-semibold rounded-2xl transition-all hover:scale-[1.03] ${
+                isDark
+                  ? 'bg-white/5 text-white/80 border border-white/10 hover:bg-green-primary/15 hover:text-green-light hover:border-green-primary/40 hover:shadow-[0_0_25px_rgba(76,175,80,0.2)]'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-green-primary/10 hover:text-green-primary hover:border-green-primary/30 hover:shadow-[0_0_20px_rgba(76,175,80,0.2)]'
+              }`}>
+                <Eye size={16} /> Live Dashboard
+              </Link>
+            </motion.div>
 
-              {/* CTA buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.45 }}
-                className="flex flex-wrap gap-3 mb-10"
-              >
-                <Link
-                  to="/nodes"
-                  className="group inline-flex items-center gap-2 px-7 py-3.5 bg-forest text-white font-bold rounded-2xl transition-all hover:scale-[1.03] hover:shadow-[0_0_30px_rgba(27,94,32,0.4)] hover:bg-green-primary"
-                >
-                  Explore Our Nodes
-                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  to="/dashboard"
-                  className="group inline-flex items-center gap-2 px-7 py-3.5 font-semibold rounded-2xl bg-white text-gray-700 border border-gray-200 hover:bg-green-primary/10 hover:text-green-primary hover:border-green-primary/30 hover:shadow-[0_0_20px_rgba(76,175,80,0.2)] transition-all hover:scale-[1.03]"
-                >
-                  <Eye size={16} /> {t.btnDashboard}
-                </Link>
-              </motion.div>
-
-              {/* Feature badges */}
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                className="flex flex-wrap gap-2"
-              >
-                {[
-                  { icon: TrendingUp, label: t.badge1 },
-                  { icon: Gauge,      label: t.badge2 },
-                  { icon: Battery,    label: t.badge3 },
-                  { icon: Cpu,        label: t.badge4 },
-                  { icon: Shield,     label: t.badge5 },
-                ].map(({ icon: Icon, label }, i) => (
-                  <motion.span
-                    key={label}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.65 + i * 0.08 }}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-full text-xs font-medium text-gray-700 shadow-xs"
-                  >
-                    <Icon size={13} className="text-green-primary" />
-                    {label}
-                  </motion.span>
-                ))}
-              </motion.div>
-            </div>
-
-
+            {/* Stats bar */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.9 }}
+              className="flex flex-wrap gap-6">
+              {[{ value: '1', label: 'Active Node' }, { value: '4', label: 'Data Points' }, { value: '30%', label: 'Water Saved' }, { value: 'Kuwait', label: 'Proudly Based' }].map((s, i) => (
+                <motion.div key={s.label} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1 + i * 0.1 }}
+                  className="flex flex-col">
+                  <span className={`text-2xl font-black transition-colors duration-500 ${isDark ? 'text-white' : 'text-[#0a120e]'}`}>{s.value}</span>
+                  <span className={`text-[10px] uppercase tracking-wider transition-colors duration-500 ${isDark ? 'text-white/30' : 'text-gray-400'}`}>{s.label}</span>
+                </motion.div>
+              ))}
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════════ */}
@@ -292,9 +214,9 @@ export default function Home() {
       <section className={`relative py-32 transition-colors duration-500 ${isDark ? 'bg-[#0a120e]' : 'bg-[#F7FAF7]'}`}>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 mb-16">
           <ScrollReveal>
-            <span className={`text-xs font-bold uppercase tracking-[0.2em] transition-colors duration-500 ${isDark ? 'text-green-light' : 'text-green-primary'}`}>{t.hardwareBadge}</span>
+            <span className={`text-xs font-bold uppercase tracking-[0.2em] transition-colors duration-500 ${isDark ? 'text-green-light' : 'text-green-primary'}`}>Hardware</span>
             <h2 className={`text-4xl sm:text-6xl font-black mt-2 leading-tight transition-colors duration-500 ${isDark ? 'text-white' : 'text-[#0a120e]'}`}>
-              {t.hardwareTitle1}<br />{t.hardwareTitle2} <span className="text-transparent bg-clip-text bg-gradient-to-r from-lime to-green-light">{t.hardwareTitle3}</span>
+              Built for<br />Every <span className="text-transparent bg-clip-text bg-gradient-to-r from-lime to-green-light">Stage.</span>
             </h2>
           </ScrollReveal>
           <ScrollReveal delay={0.2}>
@@ -307,17 +229,17 @@ export default function Home() {
               }`}
             >
               <Eye size={16} />
-              View Dashboard
+              View Live Dashboard
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </ScrollReveal>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 sm:px-6 max-w-7xl mx-auto w-full">
-          {tNodes.map((node, i) => (
+        <motion.div style={{ x: nodesX }} className="flex gap-6 px-4 sm:px-6 will-change-transform">
+          {nodes.map((node, i) => (
             <motion.div key={node.level}
               initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ duration: 0.7, delay: i * 0.15 }}
-              className="relative">
+              className="min-w-[340px] sm:min-w-[400px] relative">
               <motion.div whileHover={{ y: -15, rotate: 0 }} transition={{ type: 'spring', stiffness: 200 }}
                 className={`rounded-[2rem] border overflow-hidden group transition-colors duration-500 relative min-h-[480px] ${
                   isDark ? 'bg-white/5 border-white/10 backdrop-blur-xl' : 'bg-white border-gray-200 shadow-lg'
@@ -362,7 +284,7 @@ export default function Home() {
               </motion.div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════════ */}
@@ -394,7 +316,7 @@ export default function Home() {
 
           {/* Metrics */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
-            {tMetrics.map((metric, idx) => {
+            {metrics.map((metric, idx) => {
               const Icon = metric.icon;
               return (
                 <div key={metric.label}>
@@ -569,7 +491,7 @@ export default function Home() {
             </h2>
           </ScrollReveal>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {tFeatures.map((feature, idx) => {
+            {features.map((feature, idx) => {
               const Icon = feature.icon;
               return (
                 <ScrollReveal key={feature.title} delay={idx * 0.08}>
@@ -638,18 +560,17 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <motion.div whileHover={{ scale: 1.06, y: -3 }} whileTap={{ scale: 0.94 }}>
-                <Link to={isLoggedIn ? '/portal/dashboard' : '/auth?tab=signup'}
-                  className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-lime to-green-light text-forest font-black text-lg rounded-2xl transition-all hover:shadow-[0_0_50px_rgba(139,195,74,0.5)] hover:from-green-light hover:to-lime hover:text-[#1B5E20]">
-                  {isLoggedIn ? 'Go to Portal' : 'Start Monitoring'} <ArrowUpRight size={22} />
+                <Link to="/contact" className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-lime to-green-light text-forest font-black text-lg rounded-2xl transition-all hover:shadow-[0_0_50px_rgba(139,195,74,0.5)] hover:from-green-light hover:to-lime hover:text-[#1B5E20]">
+                  Start Monitoring <ArrowUpRight size={22} />
                 </Link>
               </motion.div>
               <motion.div whileHover={{ scale: 1.06, y: -3 }} whileTap={{ scale: 0.94 }}>
-                <Link to="/pricing" className={`inline-flex items-center gap-2 px-10 py-5 font-bold rounded-2xl transition-all group ${
+                <Link to="/contact" className={`inline-flex items-center gap-2 px-10 py-5 font-bold rounded-2xl transition-all group ${
                   isDark
                     ? 'bg-white/5 text-white/70 border border-white/10 hover:bg-green-primary/15 hover:text-green-light hover:border-green-primary/40 hover:shadow-[0_0_30px_rgba(76,175,80,0.2)]'
                     : 'bg-white text-gray-600 border border-gray-200 hover:bg-green-primary/10 hover:text-green-primary hover:border-green-primary/30 hover:shadow-[0_0_25px_rgba(76,175,80,0.2)]'
                 }`}>
-                  View Pricing
+                  Contact Team
                 </Link>
               </motion.div>
             </div>
