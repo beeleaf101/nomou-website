@@ -1,8 +1,15 @@
 export const config = { runtime: 'edge' };
 
 export default async function handler(req) {
-  const ARDUINO_URL = process.env.VITE_ARDUINO_URL || 'http://192.168.8.196';
-  
+  const ARDUINO_URL = process.env.ARDUINO_URL;
+
+  if (!ARDUINO_URL) {
+    return new Response(JSON.stringify({ error: 'ARDUINO_URL not configured' }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+    });
+  }
+
   const url = new URL(req.url);
   const path = url.searchParams.get('path') || '/api/current';
 
@@ -24,10 +31,7 @@ export default async function handler(req) {
   } catch {
     return new Response(JSON.stringify({ error: 'Arduino offline' }), {
       status: 503,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   }
 }
