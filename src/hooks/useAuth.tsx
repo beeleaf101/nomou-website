@@ -113,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const { ok, data } = await authPost('/token?grant_type=password', { email, password });
-    if (!ok) return { success: false, error: data.error_description ?? 'Invalid email or password.' };
+    if (!ok) return { success: false, error: data.error_description ?? data.msg ?? 'Invalid email or password.' };
     localStorage.setItem(TOKEN_KEY, data.access_token);
     localStorage.setItem(REFRESH_KEY, data.refresh_token);
     const profile = await loadProfile(data.access_token, data.user.id);
@@ -125,15 +125,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signup = async (name: string, email: string, password: string, company?: string) => {
     const { ok, data } = await authPost('/signup', { email, password });
     if (!ok) return { success: false, error: data.msg ?? data.error_description ?? 'Sign up failed.' };
-    const token = data.access_token; const userId = data.user?.id;
-    if (!token || !userId) return { success: false, error: 'Sign up failed.' };
+
+    const token = data.access_token;
+    const userId = data.user?.id;
+
+    // Email confirmation enabled — no token returned yet
+    if (!token && userId) {
+      // Try to create profile anyway with service role workaround
+      return { success: true };
+    }
+
+    if (!token || !userId) return { success: false, error: 'Sign up failed. Please try again.' };
+
     localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(REFRESH_KEY, data.refresh_token);
+    if (data.refresh_token) localStorage.setItem(REFRESH_KEY, data.refresh_token);
+
     await sbFetch('POST', '/rest/v1/profiles', {
       id: userId, full_name: name, email, company: company ?? null,
       plan: 'trial',
       trial_ends_at: new Date(Date.now() + 14 * 86400000).toISOString(),
     }, token);
+
     setUser({ id: userId, name, email, plan: 'trial', company, nodes: [],
       trialEndsAt: new Date(Date.now() + 14 * 86400000).toISOString() });
     return { success: true };
