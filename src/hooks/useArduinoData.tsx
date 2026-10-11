@@ -11,7 +11,7 @@ const WAQI_TOKEN = import.meta.env.VITE_WAQI_TOKEN ?? '';
 function getUrl(path: string) {
   if (ARDUINO_DIRECT) return `${ARDUINO_DIRECT}${path}`;
   if (IS_DEV) return `/arduino${path}`;
-  return `/api/arduino?path=${path}`;
+  return `https://api.nomou.app${path}`;
 }
 
 function getAqiCategory(aqi: number): string {
