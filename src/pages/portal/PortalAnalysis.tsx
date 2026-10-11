@@ -10,6 +10,57 @@ import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
 import { useArduinoData } from '../../hooks/useArduinoData';
 
+type AIAdviceResult = {
+  recommendations: {
+    title: string;
+    body: string;
+    priority: 'high' | 'medium' | 'low';
+  }[];
+  longTermTips: string[];
+};
+
+async function getDeepSeekAdvice(
+  soil: number,
+  temperature: number,
+  humidity: number,
+  light: number,
+): Promise<AIAdviceResult> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+
+  try {
+    const res = await fetch('https://api.nomou.app/api/ai-advisor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        type: 'advice',
+        sensorData: {
+          soil_pct: soil,
+          temperature,
+          humidity,
+          light_pct: light,
+        },
+      }),
+      signal: controller.signal,
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data?.error || `AI server returned ${res.status}`);
+    }
+
+    if (data?.error) {
+      throw new Error(data.error);
+    }
+
+    return data as AIAdviceResult;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 // ── AI Analysis engine (client-side, based on live sensor data) ──────────────
 function generateAnalysis(soil: number, temp: number, humidity: number, light: number) {
   const issues: { severity: 'critical'|'warning'|'good'; label: string; detail: string; icon: React.ElementType; color: string }[] = [];
@@ -79,7 +130,9 @@ export default function PortalAnalysis() {
   const { current, history } = useArduinoData();
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState(new Date());
-
+  const [aiAdvice, setAiAdvice] = useState<AIAdviceResult | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
   if (!user) return null;
 
   const isSupreme = user.plan === 'gold' || user.plan === 'trial';
@@ -120,11 +173,31 @@ export default function PortalAnalysis() {
   );
 
   const handleRefresh = async () => {
-    setRefreshing(true);
-    await new Promise(r => setTimeout(r, 800));
+  setRefreshing(true);
+  setAiLoading(true);
+  setAiError(null);
+
+  try {
+    const result = await getDeepSeekAdvice(
+      current.soil_pct,
+      current.temperature,
+      current.humidity,
+      current.light_pct,
+    );
+
+    setAiAdvice(result);
     setLastRefreshed(new Date());
+  } catch (error) {
+    setAiError(
+      error instanceof Error
+        ? error.message
+        : 'Nomou AI could not generate recommendations.',
+    );
+  } finally {
+    setAiLoading(false);
     setRefreshing(false);
-  };
+  }
+};
 
   // Chart data
   const chartData = history.labels.length > 0
@@ -302,6 +375,162 @@ export default function PortalAnalysis() {
           </AreaChart>
         </ResponsiveContainer>
       </div>
+{/* Real DeepSeek AI recommendations */}
+<div className={`${card} p-5`}>
+  <div className="flex items-center justify-between gap-3 mb-4">
+    <div>
+      <div className="flex items-center gap-2 mb-1">
+        <Sparkles size={15} className="text-amber-400" />
+        <span className="text-xs font-bold text-amber-500 uppercase tracking-wider">
+          Nomou DeepSeek AI
+        </span>
+      </div>
+
+      <h3 className={`font-bold ${isDark ? 'text-white' : 'text-[#0a120e]'}`}>
+        Live AI Recommendations
+      </h3>
+
+      <p className={`text-xs mt-1 ${isDark ? 'text-white/40' : 'text-gray-500'}`}>
+        Generated from your current soil, temperature, humidity and light readings.
+      </p>
+    </div>
+
+    <button
+      onClick={handleRefresh}
+      disabled={aiLoading}
+      className="px-3 py-2 rounded-xl bg-[#2D7A3E] text-white text-xs font-bold disabled:opacity-50"
+    >
+      {aiLoading ? 'Thinking…' : 'Ask AI'}
+    </button>
+  </div>
+
+  {aiError && (
+    <div className="rounded-xl border border-red-200 bg-red-50 p-3 mb-3">
+      <p className="text-xs font-semibold text-red-600">
+        {aiError}
+      </p>
+      <p className="text-[11px] text-red-500 mt-1">
+        Local sensor analysis below will still continue to work.
+      </p>
+    </div>
+  )}
+
+  {!aiAdvice && !aiLoading && !aiError && (
+    <div
+      className={`rounded-xl p-4 ${
+        isDark ? 'bg-white/5 text-white/50' : 'bg-gray-50 text-gray-500'
+      }`}
+    >
+      <p className="text-xs leading-relaxed">
+        Tap “Ask AI” to generate a DeepSeek analysis using the latest live Nomou sensor data.
+      </p>
+    </div>
+  )}
+
+  {aiLoading && (
+    <div
+      className={`rounded-xl p-4 ${
+        isDark ? 'bg-white/5 text-white/50' : 'bg-gray-50 text-gray-500'
+      }`}
+    >
+      <div className="flex items-center gap-2">
+        <RefreshCw size={14} className="animate-spin" />
+        <span className="text-xs font-semibold">
+          DeepSeek is analysing your field…
+        </span>
+      </div>
+    </div>
+  )}
+
+  {aiAdvice && !aiLoading && (
+    <div className="space-y-3">
+      {aiAdvice.recommendations?.map((item, index) => {
+        const priorityColor =
+          item.priority === 'high'
+            ? '#ef4444'
+            : item.priority === 'medium'
+            ? '#FF9800'
+            : '#4CAF50';
+
+        return (
+          <div
+            key={`${item.title}-${index}`}
+            className={`rounded-xl border p-4 ${
+              isDark
+                ? 'bg-white/5 border-white/10'
+                : 'bg-white border-gray-100'
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <span
+                className="text-[10px] font-bold px-2 py-1 rounded-full capitalize"
+                style={{
+                  backgroundColor: `${priorityColor}15`,
+                  color: priorityColor,
+                }}
+              >
+                {item.priority} priority
+              </span>
+
+              <h4
+                className={`text-sm font-bold ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}
+              >
+                {item.title}
+              </h4>
+            </div>
+
+            <p
+              className={`text-xs leading-relaxed ${
+                isDark ? 'text-white/50' : 'text-gray-500'
+              }`}
+            >
+              {item.body}
+            </p>
+          </div>
+        );
+      })}
+
+      {aiAdvice.longTermTips?.length > 0 && (
+        <div
+          className={`rounded-xl p-4 ${
+            isDark ? 'bg-white/5' : 'bg-[#F4F8F4]'
+          }`}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <Leaf size={14} className="text-[#2D7A3E]" />
+            <h4
+              className={`text-sm font-bold ${
+                isDark ? 'text-white' : 'text-gray-900'
+              }`}
+            >
+              Long-term guidance
+            </h4>
+          </div>
+
+          <div className="space-y-2">
+            {aiAdvice.longTermTips.map((tip, index) => (
+              <div key={index} className="flex items-start gap-2">
+                <CheckCircle
+                  size={12}
+                  className="text-[#2D7A3E] mt-0.5 shrink-0"
+                />
+                <p
+                  className={`text-xs leading-relaxed ${
+                    isDark ? 'text-white/50' : 'text-gray-500'
+                  }`}
+                >
+                  {tip}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )}
+</div>
 
       {/* Recommendations */}
       {recs.length > 0 && (
