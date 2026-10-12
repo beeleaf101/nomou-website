@@ -200,3 +200,72 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #1B5E20;
 }
+
+
+/* Mobile-first responsive polish */
+html, body, #root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img, video, canvas, svg {
+  max-width: 100%;
+}
+
+body {
+  min-width: 320px;
+}
+
+@media (max-width: 767px) {
+  /* Give each section breathing room without the desktop-sized gaps. */
+  section {
+    padding-top: clamp(3.5rem, 10vw, 5rem) !important;
+    padding-bottom: clamp(3.5rem, 10vw, 5rem) !important;
+  }
+
+  /* Prevent decorative fixed backgrounds from behaving badly on iOS/Android. */
+  .bg-fixed {
+    background-attachment: scroll !important;
+  }
+
+  /* Make large dashboard/chart blocks feel like cards instead of squeezed desktop panels. */
+  .recharts-responsive-container {
+    min-height: 260px;
+  }
+
+  /* Better touch/reading rhythm on small screens. */
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+
+  /* Common mobile card spacing used throughout the marketing pages. */
+  .mobile-card-stack > * + * {
+    margin-top: 0.875rem;
+  }
+}
+
+@media (max-width: 420px) {
+  section {
+    padding-top: 3.25rem !important;
+    padding-bottom: 3.25rem !important;
+  }
+
+  .recharts-responsive-container {
+    min-height: 230px;
+  }
+}
+
+/* Respect phone notches / home indicators. */
+.safe-bottom {
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+}
