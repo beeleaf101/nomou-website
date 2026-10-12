@@ -24,7 +24,8 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const { login, signup } = useAuth();
+  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
+  const { login, signup, signInWithGoogle } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
 
@@ -35,7 +36,7 @@ export default function AuthPage() {
   const [signPass, setSignPass]       = useState('');
   const [signCompany, setSignCompany] = useState('');
 
-  useEffect(() => { setError(''); }, [tab]);
+  useEffect(() => { setError(''); setNeedsEmailConfirmation(false); }, [tab]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,8 +53,14 @@ export default function AuthPage() {
     setLoading(true); setError('');
     const res = await signup(signName, signEmail, signPass, signCompany);
     setLoading(false);
-    if (res.success) { setSuccess(true); setTimeout(() => navigate('/portal/subscription'), 600); }
-    else setError(res.error ?? 'Sign up failed.');
+    if (res.success) {
+      if (res.needsEmailConfirmation) {
+        setNeedsEmailConfirmation(true);
+      } else {
+        setSuccess(true);
+        setTimeout(() => navigate('/portal/subscription'), 600);
+      }
+    } else setError(res.error ?? 'Sign up failed.');
   };
 
   const inputBase = `w-full pl-10 pr-4 py-3 rounded-xl border text-sm outline-none transition-all duration-200 ${
@@ -152,7 +159,7 @@ export default function AuthPage() {
         </div>
 
         {/* Form */}
-        <div className="flex-1 flex items-center justify-center p-6 py-10">
+        <div className="flex-1 flex items-start sm:items-center justify-center px-4 sm:px-6 py-6 sm:py-10">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
             className="w-full max-w-md">
 
@@ -180,10 +187,47 @@ export default function AuthPage() {
               ))}
             </div>
 
+            {/* Google sign-in */}
+            <button
+              type="button"
+              onClick={signInWithGoogle}
+              className={`w-full mb-4 flex items-center justify-center gap-3 px-4 py-3.5 rounded-2xl border text-sm font-bold transition-all duration-200 shadow-sm ${isDark
+                ? 'bg-white text-gray-900 border-white hover:bg-gray-100'
+                : 'bg-white text-gray-800 border-gray-200 hover:border-gray-300 hover:shadow-md'}`}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#4285F4" d="M21.35 12.27c0-.78-.07-1.53-.2-2.25H12v4.26h5.23a4.47 4.47 0 0 1-1.94 2.93v2.43h3.14c1.84-1.69 2.92-4.19 2.92-7.37Z"/>
+                <path fill="#34A853" d="M12 21.75c2.63 0 4.84-.87 6.45-2.36l-3.14-2.43c-.87.58-1.98.93-3.31.93-2.54 0-4.69-1.72-5.46-4.03H3.3v2.52A9.75 9.75 0 0 0 12 21.75Z"/>
+                <path fill="#FBBC05" d="M6.54 13.86A5.86 5.86 0 0 1 6.23 12c0-.65.11-1.28.31-1.86V7.62H3.3A9.75 9.75 0 0 0 2.25 12c0 1.57.38 3.06 1.05 4.38l3.24-2.52Z"/>
+                <path fill="#EA4335" d="M12 6.11c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.83 3.2 14.62 2.25 12 2.25A9.75 9.75 0 0 0 3.3 7.62l3.24 2.52C7.31 7.83 9.46 6.11 12 6.11Z"/>
+              </svg>
+              Continue with Google
+            </button>
+
+            <div className="flex items-center gap-3 mb-5">
+              <div className={`h-px flex-1 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
+              <span className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? 'text-white/25' : 'text-gray-400'}`}>or continue with email</span>
+              <div className={`h-px flex-1 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
+            </div>
+
             {/* Card */}
-            <div className={`rounded-3xl border p-7 shadow-xl ${isDark ? 'bg-white/[0.04] border-white/8 shadow-black/30' : 'bg-white border-gray-100 shadow-green-primary/5'}`}>
+            <div className={`rounded-[1.5rem] sm:rounded-3xl border p-5 sm:p-7 shadow-xl ${isDark ? 'bg-white/[0.04] border-white/8 shadow-black/30' : 'bg-white border-gray-100 shadow-green-primary/5'}`}>
               <AnimatePresence mode="wait">
-                {success ? (
+                {needsEmailConfirmation ? (
+                  <motion.div key="confirm" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
+                    className="py-6 flex flex-col items-center text-center gap-3">
+                    <div className="w-14 h-14 rounded-full bg-green-primary/15 flex items-center justify-center">
+                      <Mail size={28} className="text-green-primary" />
+                    </div>
+                    <p className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>Check your email</p>
+                    <p className={`text-sm leading-relaxed max-w-xs ${isDark ? 'text-white/45' : 'text-gray-500'}`}>
+                      We sent a confirmation link to <span className="font-semibold">{signEmail}</span>. Confirm it, then come back and log in.
+                    </p>
+                    <button type="button" onClick={() => setTab('login')} className="mt-2 text-green-primary font-bold text-sm hover:text-green-light">
+                      Go to Log In
+                    </button>
+                  </motion.div>
+                ) : success ? (
                   <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                     className="py-8 flex flex-col items-center gap-3">
                     <div className="w-14 h-14 rounded-full bg-green-primary/15 flex items-center justify-center">
@@ -201,7 +245,7 @@ export default function AuthPage() {
                       <label className={`text-xs font-bold uppercase tracking-wider mb-2 block ${isDark ? 'text-white/40' : 'text-gray-500'}`}>Email Address</label>
                       <div className="relative">
                         <Mail size={15} className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${isDark ? 'text-white/25' : 'text-gray-400'}`} />
-                        <input type="email" required placeholder="you@example.com" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} className={inputBase} />
+                        <input type="email" autoComplete="email" required placeholder="you@example.com" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} className={inputBase} />
                       </div>
                     </div>
                     <div>
@@ -210,8 +254,8 @@ export default function AuthPage() {
                       </div>
                       <div className="relative">
                         <Lock size={15} className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${isDark ? 'text-white/25' : 'text-gray-400'}`} />
-                        <input type={showPass ? 'text' : 'password'} required placeholder="••••••••" value={loginPass} onChange={e => setLoginPass(e.target.value)} className={inputBase} />
-                        <button type="button" onClick={() => setShowPass(!showPass)}
+                        <input type={showPass ? 'text' : 'password'} autoComplete="current-password" required placeholder="••••••••" value={loginPass} onChange={e => setLoginPass(e.target.value)} className={inputBase} />
+                        <button type="button" aria-label={showPass ? 'Hide password' : 'Show password'} onClick={() => setShowPass(!showPass)}
                           className={`absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors ${isDark ? 'text-white/25 hover:text-white/50' : 'text-gray-300 hover:text-gray-500'}`}>
                           {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
                         </button>
@@ -256,9 +300,9 @@ export default function AuthPage() {
                       <label className={`text-xs font-bold uppercase tracking-wider mb-2 block ${isDark ? 'text-white/40' : 'text-gray-500'}`}>Password</label>
                       <div className="relative">
                         <Lock size={15} className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${isDark ? 'text-white/25' : 'text-gray-400'}`} />
-                        <input type={showPass ? 'text' : 'password'} required placeholder="Min. 8 characters" value={signPass}
+                        <input type={showPass ? 'text' : 'password'} autoComplete="new-password" required placeholder="Min. 8 characters" value={signPass}
                           onChange={e => setSignPass(e.target.value)} className={inputBase} />
-                        <button type="button" onClick={() => setShowPass(!showPass)}
+                        <button type="button" aria-label={showPass ? 'Hide password' : 'Show password'} onClick={() => setShowPass(!showPass)}
                           className={`absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors ${isDark ? 'text-white/25 hover:text-white/50' : 'text-gray-300 hover:text-gray-500'}`}>
                           {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
                         </button>
