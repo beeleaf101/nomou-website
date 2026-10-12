@@ -107,8 +107,9 @@ export default function Navbar() {
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Auth buttons */}
+            <div className="hidden sm:block">
             {isLoggedIn ? (
               <Link to="/portal/dashboard">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
@@ -135,14 +136,14 @@ export default function Navbar() {
                 </Link>
               </div>
             )}
-
+            </div>
 
             {/* Theme Toggle */}
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={toggle}
-              className={`relative w-14 h-8 rounded-full p-1 transition-colors duration-300 ${
+              className={`hidden sm:block relative w-14 h-8 rounded-full p-1 transition-colors duration-300 ${
                 isDark
                   ? 'bg-white/10 border border-white/10'
                   : 'bg-gray-100 border border-gray-200'
@@ -195,7 +196,7 @@ export default function Navbar() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 320 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className={`fixed top-0 right-0 bottom-0 w-80 z-[60] overflow-y-auto ${
+            className={`fixed top-0 right-0 bottom-0 w-full max-w-[20rem] z-[60] overflow-y-auto safe-bottom ${
               isDark ? 'bg-[#0a120e] border-l border-white/5' : 'bg-white border-l border-gray-100'
             }`}
           >
@@ -228,6 +229,27 @@ export default function Navbar() {
                     </motion.div>
                   );
                 })}
+              </div>
+
+              {/* Mobile account actions */}
+              <div className={`mt-6 pt-6 border-t ${isDark ? 'border-white/10' : 'border-gray-100'}`}>
+                {isLoggedIn ? (
+                  <Link to="/portal/dashboard"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-green-primary text-white text-sm font-bold hover:bg-green-light transition-colors">
+                    Open Portal
+                  </Link>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link to="/auth"
+                      className={`flex items-center justify-center px-4 py-3 rounded-xl text-sm font-semibold border ${isDark ? 'border-white/10 text-white/70 hover:bg-white/5' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+                      Log In
+                    </Link>
+                    <Link to="/auth?tab=signup"
+                      className="flex items-center justify-center px-4 py-3 rounded-xl text-sm font-bold bg-green-primary text-white hover:bg-green-light transition-colors">
+                      Sign Up
+                    </Link>
+                  </div>
+                )}
               </div>
 
               {/* Mobile Theme Toggle */}
