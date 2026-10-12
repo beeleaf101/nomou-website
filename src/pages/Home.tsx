@@ -167,24 +167,24 @@ export default function Home() {
       {/* ═══════════════════════════════════════════════════════════ */}
       {/*  HERO                                                       */}
       {/* ═══════════════════════════════════════════════════════════ */}
-      <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden bg-[#0a120e]">
+      <section className="relative min-h-[100dvh] lg:min-h-[100dvh] overflow-hidden bg-[#0a120e] flex items-end lg:items-center">
         {/* Full-bleed background image */}
         <div className="absolute inset-0">
           <img
             src="/images/hero-bg1.jpeg"
             alt=""
-            className="w-full h-full object-contain object-center"
+            className="w-full h-full object-cover object-[68%_center] sm:object-center"
             style={{ imageRendering: 'auto', filter: 'contrast(1.08) saturate(1.1)' }}
           />
           {/* Subtle left-side overlay so text stays readable */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/65 via-white/15 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/15 via-white/20 to-[#0a120e]/95 lg:bg-gradient-to-r lg:from-white/70 lg:via-white/20 lg:to-transparent" />
           {/* Bottom fade into next section */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a120e] to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#0a120e] via-[#0a120e]/80 to-transparent" />
         </div>
 
         {/* Scroll indicator */}
         <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
+          className="hidden lg:flex absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex-col items-center gap-2"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2, duration: 0.6 }}
@@ -203,17 +203,17 @@ export default function Home() {
         </motion.div>
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-28 pb-0">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-6 pt-28 pb-10 sm:pb-14 lg:pb-0">
           <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-0">
 
             {/* ── Left: text ── */}
-            <div className="flex-1 max-w-xl">
+            <div className="flex-1 max-w-xl w-full lg:w-auto rounded-[1.75rem] lg:rounded-none bg-white/92 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-none p-5 sm:p-7 lg:p-0 shadow-2xl lg:shadow-none border border-white/60 lg:border-0">
               {/* Badge */}
               <motion.p
                 initial={{ opacity: 0, y: -12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="text-xs font-bold uppercase tracking-[0.25em] text-green-primary mb-4"
+                className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.18em] sm:tracking-[0.25em] text-green-primary mb-3 sm:mb-4"
               >
                 {t.badge}
               </motion.p>
@@ -223,7 +223,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.15 }}
-                className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight text-[#0a120e] mb-5"
+                className="text-[2.15rem] sm:text-5xl lg:text-6xl font-black leading-[1.02] sm:leading-[1.05] tracking-tight text-[#0a120e] mb-4 sm:mb-5"
               >
                 {t.headline1}{' '}
                 <span className="text-green-primary">{t.headline2}</span>
@@ -234,7 +234,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.3 }}
-                className="text-base text-gray-500 leading-relaxed mb-8 max-w-md"
+                className="text-[15px] sm:text-base text-gray-600 leading-7 sm:leading-relaxed mb-6 sm:mb-8 max-w-md"
               >
                 {t.sub}
               </motion.p>
@@ -244,18 +244,18 @@ export default function Home() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.45 }}
-                className="flex flex-wrap gap-3 mb-10"
+                className="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 mb-7 sm:mb-10"
               >
                 <Link
                   to="/nodes"
-                  className="group inline-flex items-center gap-2 px-7 py-3.5 bg-forest text-white font-bold rounded-2xl transition-all hover:scale-[1.03] hover:shadow-[0_0_30px_rgba(27,94,32,0.4)] hover:bg-green-primary"
+                  className="group inline-flex w-full sm:w-auto justify-center items-center gap-2 px-6 sm:px-7 py-3.5 bg-forest text-white font-bold rounded-2xl transition-all hover:scale-[1.03] hover:shadow-[0_0_30px_rgba(27,94,32,0.4)] hover:bg-green-primary"
                 >
                   Explore Our Nodes
                   <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   to="/dashboard"
-                  className="group inline-flex items-center gap-2 px-7 py-3.5 font-semibold rounded-2xl bg-white text-gray-700 border border-gray-200 hover:bg-green-primary/10 hover:text-green-primary hover:border-green-primary/30 hover:shadow-[0_0_20px_rgba(76,175,80,0.2)] transition-all hover:scale-[1.03]"
+                  className="group inline-flex w-full sm:w-auto justify-center items-center gap-2 px-6 sm:px-7 py-3.5 font-semibold rounded-2xl bg-white text-gray-700 border border-gray-200 hover:bg-green-primary/10 hover:text-green-primary hover:border-green-primary/30 hover:shadow-[0_0_20px_rgba(76,175,80,0.2)] transition-all hover:scale-[1.03]"
                 >
                   <Eye size={16} /> {t.btnDashboard}
                 </Link>
@@ -266,7 +266,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
-                className="flex flex-wrap gap-2"
+                className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2"
               >
                 {[
                   { icon: TrendingUp, label: t.badge1 },
@@ -280,7 +280,7 @@ export default function Home() {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.65 + i * 0.08 }}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-full text-xs font-medium text-gray-700 shadow-xs"
+                    className="inline-flex min-w-0 items-center justify-center sm:justify-start gap-1.5 px-3 py-2 bg-white/85 backdrop-blur-sm border border-gray-200/70 rounded-xl sm:rounded-full text-[11px] sm:text-xs font-medium text-gray-700 shadow-xs text-center sm:text-left"
                   >
                     <Icon size={13} className="text-green-primary" />
                     {label}
