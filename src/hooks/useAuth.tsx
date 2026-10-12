@@ -20,8 +20,7 @@ export interface User {
 interface AuthContextType {
   user: User | null; loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signup: (name: string, email: string, password: string, company?: string) => Promise<{ success: boolean; error?: string; needsEmailConfirmation?: boolean }>;
-  signInWithGoogle: () => void;
+  signup: (name: string, email: string, password: string, company?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   updatePlan: (plan: Plan) => Promise<void>;
   isLoggedIn: boolean;
@@ -75,45 +74,10 @@ async function loadProfile(token: string, userId: string): Promise<User | null> 
   return { id: userId, name: p.full_name, email: p.email, plan: p.plan as Plan, company: p.company, trialEndsAt: p.trial_ends_at, nodes };
 }
 
-async function ensureProfile(token: string, authUser: any): Promise<User | null> {
-  const existing = await loadProfile(token, authUser.id);
-  if (existing) return existing;
-
-  const name =
-    authUser.user_metadata?.full_name ||
-    authUser.user_metadata?.name ||
-    authUser.email?.split('@')[0] ||
-    'Nomou User';
-  const company = authUser.user_metadata?.company ?? null;
-  const trialEndsAt = new Date(Date.now() + 14 * 86400000).toISOString();
-
-  const created = await sbFetch('POST', '/rest/v1/profiles', {
-    id: authUser.id,
-    full_name: name,
-    email: authUser.email,
-    company,
-    plan: 'trial',
-    trial_ends_at: trialEndsAt,
-  }, token);
-
-  if (!created.ok) return null;
-
-  return {
-    id: authUser.id,
-    name,
-    email: authUser.email,
-    plan: 'trial',
-    company: company ?? undefined,
-    trialEndsAt,
-    nodes: [],
-  };
-}
-
 const AuthContext = createContext<AuthContextType>({
   user: null, loading: true,
   login: async () => ({ success: false }),
   signup: async () => ({ success: false }),
-  signInWithGoogle: () => {},
   logout: async () => {},
   updatePlan: async () => {},
   isLoggedIn: false,
@@ -125,54 +89,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const restore = async () => {
-      // Supabase OAuth implicit flow returns tokens in the URL hash. Because
-      // Nomou uses HashRouter, capture those tokens before treating the hash
-      // as a client-side route.
-      const rawHash = window.location.hash.startsWith('#')
-        ? window.location.hash.slice(1)
-        : window.location.hash;
-      const oauthParams = new URLSearchParams(rawHash);
-      const oauthToken = oauthParams.get('access_token');
-      const oauthRefresh = oauthParams.get('refresh_token');
-
-      if (oauthToken) {
-        localStorage.setItem(TOKEN_KEY, oauthToken);
-        if (oauthRefresh) localStorage.setItem(REFRESH_KEY, oauthRefresh);
-
-        const meRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-          headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${oauthToken}` },
-        });
-
-        if (meRes.ok) {
-          const me = await meRes.json();
-          const profile = await ensureProfile(oauthToken, me);
-          setUser(profile);
-          window.history.replaceState({}, '', '/#/portal/dashboard');
-          setLoading(false);
-          return;
-        }
-      }
-
       const token = localStorage.getItem(TOKEN_KEY);
       const refresh = localStorage.getItem(REFRESH_KEY);
       if (!token) { setLoading(false); return; }
-
       const meRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
         headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${token}` },
       });
       if (meRes.ok) {
         const me = await meRes.json();
-        setUser(await ensureProfile(token, me));
+        setUser(await loadProfile(token, me.id));
       } else if (refresh) {
         const r = await authPost('/token?grant_type=refresh_token', { refresh_token: refresh });
         if (r.ok && r.data.access_token) {
           localStorage.setItem(TOKEN_KEY, r.data.access_token);
           localStorage.setItem(REFRESH_KEY, r.data.refresh_token);
-          setUser(await ensureProfile(r.data.access_token, r.data.user));
-        } else {
-          localStorage.removeItem(TOKEN_KEY);
-          localStorage.removeItem(REFRESH_KEY);
-        }
+          setUser(await loadProfile(r.data.access_token, r.data.user.id));
+        } else { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(REFRESH_KEY); }
       }
       setLoading(false);
     };
@@ -184,27 +116,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!ok) return { success: false, error: data.error_description ?? data.msg ?? 'Invalid email or password.' };
     localStorage.setItem(TOKEN_KEY, data.access_token);
     localStorage.setItem(REFRESH_KEY, data.refresh_token);
-    const profile = await ensureProfile(data.access_token, data.user);
-    if (!profile) return { success: false, error: 'We signed you in, but could not load your Nomou profile.' };
+    const profile = await loadProfile(data.access_token, data.user.id);
+    if (!profile) return { success: false, error: 'Profile not found.' };
     setUser(profile);
     return { success: true };
   };
 
   const signup = async (name: string, email: string, password: string, company?: string) => {
-    const { ok, data } = await authPost('/signup', {
-      email,
-      password,
-      data: { full_name: name, company: company ?? null },
-    });
+    const { ok, data } = await authPost('/signup', { email, password });
     if (!ok) return { success: false, error: data.msg ?? data.error_description ?? 'Sign up failed.' };
 
     const token = data.access_token;
     const userId = data.user?.id;
 
-    // Email confirmation enabled — the account exists, but the user must
-    // verify the email before a session can be created.
+    // Email confirmation enabled — no token returned yet
     if (!token && userId) {
-      return { success: true, needsEmailConfirmation: true };
+      // Try to create profile anyway with service role workaround
+      return { success: true };
     }
 
     if (!token || !userId) return { success: false, error: 'Sign up failed. Please try again.' };
@@ -221,14 +149,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser({ id: userId, name, email, plan: 'trial', company, nodes: [],
       trialEndsAt: new Date(Date.now() + 14 * 86400000).toISOString() });
     return { success: true };
-  };
-
-  const signInWithGoogle = () => {
-    const redirectTo = `${window.location.origin}/`;
-    const url = new URL(`${SUPABASE_URL}/auth/v1/authorize`);
-    url.searchParams.set('provider', 'google');
-    url.searchParams.set('redirect_to', redirectTo);
-    window.location.assign(url.toString());
   };
 
   const logout = async () => {
@@ -248,7 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, signInWithGoogle, logout, updatePlan, isLoggedIn: !!user }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, logout, updatePlan, isLoggedIn: !!user }}>
       {children}
     </AuthContext.Provider>
   );
