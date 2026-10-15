@@ -22,9 +22,10 @@ export default function AuthPage() {
   const [tab, setTab] = useState<'login' | 'signup'>(defaultTab);
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const { login, signup } = useAuth();
+  const { login, signup, signInWithGoogle } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
 
@@ -54,6 +55,16 @@ export default function AuthPage() {
     setLoading(false);
     if (res.success) { setSuccess(true); setTimeout(() => navigate('/portal/subscription'), 600); }
     else setError(res.error ?? 'Sign up failed.');
+  };
+
+  const handleGoogle = async () => {
+    setGoogleLoading(true);
+    setError('');
+    const res = await signInWithGoogle();
+    if (!res.success) {
+      setGoogleLoading(false);
+      setError(res.error ?? 'Google sign-in failed.');
+    }
   };
 
   const inputBase = `w-full pl-10 pr-4 py-3 rounded-xl border text-sm outline-none transition-all duration-200 ${
@@ -182,6 +193,36 @@ export default function AuthPage() {
 
             {/* Card */}
             <div className={`rounded-3xl border p-7 shadow-xl ${isDark ? 'bg-white/[0.04] border-white/8 shadow-black/30' : 'bg-white border-gray-100 shadow-green-primary/5'}`}>
+              {!success && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleGoogle}
+                    disabled={googleLoading || loading}
+                    className={`w-full py-3.5 rounded-xl border flex items-center justify-center gap-3 text-sm font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? 'bg-white text-gray-900 border-white hover:bg-gray-100' : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50 shadow-sm'}`}
+                  >
+                    {googleLoading ? (
+                      <span className="w-5 h-5 border-2 border-gray-300 border-t-green-primary rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+                          <path fill="#4285F4" d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.482h4.844a4.14 4.14 0 0 1-1.797 2.716v2.258h2.909c1.703-1.568 2.684-3.879 2.684-6.615Z"/>
+                          <path fill="#34A853" d="M9 18c2.43 0 4.468-.806 5.956-2.18l-2.909-2.258c-.806.54-1.835.859-3.047.859-2.344 0-4.328-1.585-5.037-3.714H.956v2.332A9 9 0 0 0 9 18Z"/>
+                          <path fill="#FBBC05" d="M3.963 10.707A5.41 5.41 0 0 1 3.681 9c0-.592.102-1.167.282-1.707V4.961H.956A9 9 0 0 0 0 9c0 1.452.347 2.827.956 4.039l3.007-2.332Z"/>
+                          <path fill="#EA4335" d="M9 3.579c1.322 0 2.508.454 3.441 1.346l2.581-2.581C13.464.892 11.426 0 9 0A9 9 0 0 0 .956 4.961l3.007 2.332C4.672 5.164 6.656 3.579 9 3.579Z"/>
+                        </svg>
+                        Continue with Google
+                      </>
+                    )}
+                  </button>
+
+                  <div className="flex items-center gap-3 my-5">
+                    <div className={`h-px flex-1 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
+                    <span className={`text-[11px] font-bold uppercase tracking-wider ${isDark ? 'text-white/25' : 'text-gray-400'}`}>or</span>
+                    <div className={`h-px flex-1 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
+                  </div>
+                </>
+              )}
               <AnimatePresence mode="wait">
                 {success ? (
                   <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
