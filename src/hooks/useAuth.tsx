@@ -136,6 +136,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session.refresh_token) localStorage.setItem(REFRESH_KEY, session.refresh_token);
       const profile = await ensureProfile(session.access_token, session.user);
       if (mounted) setUser(profile);
+
+      const params = new URLSearchParams(window.location.search);
+      if (profile && params.get('oauth') === 'google') {
+        window.history.replaceState({}, document.title, window.location.pathname);
+        window.location.hash = '#/portal/dashboard';
+      }
+
       return !!profile;
     };
 
