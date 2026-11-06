@@ -31,6 +31,14 @@ export interface SensorCurrent {
   soil_cat: string;
   light_pct: number;
   light_cat: string;
+  ldr_mv?: number | null;
+  nh3_mv?: number | null;
+  soil_temp?: number | null;
+  bmp_pressure?: number | null;
+  scd_co2?: number | null;
+  tds_ppm?: number | null;
+  ph?: number | null;
+  uv_mv?: number | null;
   aqi: number;
   aqi_cat: string;
   online: boolean;
@@ -96,8 +104,16 @@ export function useArduinoData() {
         humidity_cat: d.humidity_cat ?? '--',
         soil_pct:     parseInt(d.soil_pct) || 0,
         soil_cat:     d.soil_cat ?? '--',
-        light_pct:    parseInt(d.light_pct) || 0,
-        light_cat:    d.light_cat ?? '--',
+        light_pct:    Number.isFinite(Number(d.light_pct)) ? Number(d.light_pct) : 0,
+        light_cat:    d.light_cat ?? (Number.isFinite(Number(d.ldr_mv)) ? 'Raw mV only' : '--'),
+        ldr_mv:       Number.isFinite(Number(d.ldr_mv)) ? Number(d.ldr_mv) : null,
+        nh3_mv:       Number.isFinite(Number(d.nh3_mv)) ? Number(d.nh3_mv) : null,
+        soil_temp:    Number.isFinite(Number(d.soil_temp)) ? Number(d.soil_temp) : null,
+        bmp_pressure: Number.isFinite(Number(d.bmp_pressure)) ? Number(d.bmp_pressure) : null,
+        scd_co2:      Number.isFinite(Number(d.scd_co2)) ? Number(d.scd_co2) : null,
+        tds_ppm:      Number.isFinite(Number(d.tds_ppm)) ? Number(d.tds_ppm) : null,
+        ph:           Number.isFinite(Number(d.ph)) ? Number(d.ph) : null,
+        uv_mv:        Number.isFinite(Number(d.uv_mv)) ? Number(d.uv_mv) : null,
         aqi:          aqiRef.current.aqi,
         aqi_cat:      aqiRef.current.aqi_cat,
         online:       true,
