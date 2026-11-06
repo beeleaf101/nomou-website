@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate, Outlet } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Map, FileBarChart2, Wrench, CreditCard,
-  LogOut, Menu, Leaf, Bell, ChevronRight, Crown,
+  LogOut, Menu, Leaf, Bell, ChevronRight, Crown, FlaskConical,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
@@ -12,6 +12,7 @@ const navItems = [
   { path: '/portal/dashboard',    icon: LayoutDashboard, label: 'Dashboard',   supreme: false },
   { path: '/portal/map',          icon: Map,             label: 'Node Map',    supreme: false },
   { path: '/portal/reports',      icon: FileBarChart2,   label: 'Reports',     supreme: false },
+  { path: '/portal/soil-intelligence', icon: FlaskConical, label: 'Soil Intelligence', supreme: false },
   { path: '/portal/maintenance',  icon: Wrench,          label: 'Maintenance', supreme: false },
   { path: '/portal/analysis',     icon: Crown,           label: 'AI Analysis', supreme: true  },
   { path: '/portal/subscription', icon: CreditCard,      label: 'Subscription',supreme: false },
