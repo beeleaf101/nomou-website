@@ -16,6 +16,7 @@ import PortalMap from './pages/portal/PortalMap';
 import PortalReports from './pages/portal/PortalReports';
 import PortalMaintenance from './pages/portal/PortalMaintenance';
 import PortalAnalysis from './pages/portal/PortalAnalysis';
+import PortalSoilIntelligence from './pages/portal/PortalSoilIntelligence';
 import PortalPayments from './pages/portal/PortalPayments';
 import { useAuth } from './hooks/useAuth';
 
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="reports" element={<PortalReports />} />
         <Route path="maintenance" element={<PortalMaintenance />} />
         <Route path="analysis"    element={<PortalAnalysis />} />
+        <Route path="soil-intelligence" element={<PortalSoilIntelligence />} />
         <Route path="payments" element={<PortalPayments />} />
         <Route path="subscription" element={<Pricing />} />
         <Route path="checkout/:plan" element={<CheckoutPage />} />
