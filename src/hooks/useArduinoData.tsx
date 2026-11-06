@@ -14,6 +14,12 @@ function getUrl(path: string) {
   return `https://api.nomou.app${path}`;
 }
 
+function optionalNumber(value: unknown): number | null {
+  if (value === null || value === undefined || value === '') return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
 function getAqiCategory(aqi: number): string {
   if (aqi <= 50)  return 'Good';
   if (aqi <= 100) return 'Moderate';
@@ -106,14 +112,14 @@ export function useArduinoData() {
         soil_cat:     d.soil_cat ?? '--',
         light_pct:    Number.isFinite(Number(d.light_pct)) ? Number(d.light_pct) : 0,
         light_cat:    d.light_cat ?? (Number.isFinite(Number(d.ldr_mv)) ? 'Raw mV only' : '--'),
-        ldr_mv:       Number.isFinite(Number(d.ldr_mv)) ? Number(d.ldr_mv) : null,
-        nh3_mv:       Number.isFinite(Number(d.nh3_mv)) ? Number(d.nh3_mv) : null,
-        soil_temp:    Number.isFinite(Number(d.soil_temp)) ? Number(d.soil_temp) : null,
-        bmp_pressure: Number.isFinite(Number(d.bmp_pressure)) ? Number(d.bmp_pressure) : null,
-        scd_co2:      Number.isFinite(Number(d.scd_co2)) ? Number(d.scd_co2) : null,
-        tds_ppm:      Number.isFinite(Number(d.tds_ppm)) ? Number(d.tds_ppm) : null,
-        ph:           Number.isFinite(Number(d.ph)) ? Number(d.ph) : null,
-        uv_mv:        Number.isFinite(Number(d.uv_mv)) ? Number(d.uv_mv) : null,
+        ldr_mv:       optionalNumber(d.ldr_mv),
+        nh3_mv:       optionalNumber(d.nh3_mv),
+        soil_temp:       optionalNumber(d.soil_temp),
+        bmp_pressure:       optionalNumber(d.bmp_pressure),
+        scd_co2:       optionalNumber(d.scd_co2),
+        tds_ppm:       optionalNumber(d.tds_ppm),
+        ph:       optionalNumber(d.ph),
+        uv_mv:       optionalNumber(d.uv_mv),
         aqi:          aqiRef.current.aqi,
         aqi_cat:      aqiRef.current.aqi_cat,
         online:       true,
