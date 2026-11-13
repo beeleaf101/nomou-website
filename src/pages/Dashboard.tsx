@@ -535,7 +535,7 @@ export default function Dashboard() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className={`border-b transition-colors duration-500 ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
-                    {['Time', 'Node', 'Soil', 'Air', 'Water', 'Temp', 'Humidity'].map(h => (
+                    {['Time', 'Node', 'Soil Moisture', 'Temperature', 'Humidity', 'Light'].map(h => (
                       <th key={h} className={`text-left py-3 px-3 font-bold text-xs uppercase tracking-wider transition-colors duration-500 ${textFaint}`}>{h}</th>
                     ))}
                   </tr>
@@ -555,11 +555,10 @@ export default function Dashboard() {
                           <span className={`text-sm font-bold transition-colors duration-500 ${textMain}`}>A1</span>
                         </span>
                       </td>
-                      <td className="py-3 px-3 text-right font-mono text-sky text-xs font-bold">{row.soil.toFixed(1)}%</td>
-                      <td className="py-3 px-3 text-right font-mono text-green-light text-xs font-bold">{row.air.toFixed(0)}</td>
-                      <td className="py-3 px-3 text-right font-mono text-sky text-xs font-bold">{row.water.toFixed(2)}</td>
-                      <td className="py-3 px-3 text-right font-mono text-amber text-xs font-bold">{row.temp.toFixed(1)}°C</td>
-                      <td className="py-3 px-3 text-right font-mono text-green-light text-xs font-bold">{row.humidity.toFixed(0)}%</td>
+                      <td className="py-3 px-3 text-right font-mono text-sky text-xs font-bold">{row.soil == null ? '—' : `${row.soil.toFixed(1)}%`}</td>
+                      <td className="py-3 px-3 text-right font-mono text-amber text-xs font-bold">{row.temp == null ? '—' : `${row.temp.toFixed(1)}°C`}</td>
+                      <td className="py-3 px-3 text-right font-mono text-green-light text-xs font-bold">{row.humidity == null ? '—' : `${row.humidity.toFixed(0)}%`}</td>
+                      <td className="py-3 px-3 text-right font-mono text-yellow-500 text-xs font-bold">{row.light == null ? '—' : row.light.toFixed(0)}</td>
                     </motion.tr>
                   ))}
                 </tbody>
