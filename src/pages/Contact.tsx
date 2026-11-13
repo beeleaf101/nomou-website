@@ -16,7 +16,7 @@ const contactInfo = [
 const inquiryTypes = ['General Inquiry', 'Sales & Partnership', 'Technical Support', 'Research Collaboration', 'Media & Press'];
 
 const contactOptions = [
-  { icon: MessageSquare, title: 'Live Chat', desc: 'Chat with our support team in real-time during business hours.', action: 'Start Chat', href: '#' },
+  { icon: MessageSquare, title: 'Email Support', desc: 'Need help with Nomou, the app, a node or your sensor data? Contact the support team directly.', action: 'Email Support', href: 'mailto:NomouSupport@gmail.com' },
   { icon: Users, title: 'Partnerships', desc: 'Interested in distributing or integrating NOMOU into your operations?', action: 'Learn More', href: '#' },
   { icon: FlaskConical, title: 'Research', desc: 'Collaborate with us on environmental research and data projects.', action: 'Get in Touch', href: '/research' },
   { icon: ExternalLink, title: 'Documentation', desc: 'Find answers in our comprehensive developer and user documentation.', action: 'View Docs', href: '#' },
@@ -233,9 +233,9 @@ export default function Contact() {
                     </motion.div>
                     <h3 className={`text-base font-bold mb-3 transition-colors duration-500 ${text}`}>{option.title}</h3>
                     <p className={`text-sm mb-5 flex-1 transition-colors duration-500 ${textMuted}`}>{option.desc}</p>
-                    <Link to={option.href} className="text-sm font-bold text-green-primary hover:text-green-light transition-colors inline-flex items-center justify-center gap-1.5 group/link">
+                    <a href={option.href} className="text-sm font-bold text-green-primary hover:text-green-light transition-colors inline-flex items-center justify-center gap-1.5 group/link">
                       {option.action} <ArrowRight size={14} className="group-hover/link:translate-x-1 transition-transform" />
-                    </Link>
+                    </a>
                   </motion.div>
                 </ScrollReveal>
               );
