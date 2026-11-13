@@ -1,27 +1,10 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
-import { Droplets, Wind, Thermometer, CloudRain, Download, FileText, Battery, Signal, MapPin, AlertTriangle, CheckCircle, Wifi, Calendar, Printer, RefreshCw, TrendingUp } from 'lucide-react';
+import { Droplets, Thermometer, CloudRain, Download, FileText, Battery, Signal, MapPin, AlertTriangle, CheckCircle, Wifi, Calendar, Printer, RefreshCw, TrendingUp, Gauge, Radio } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
 import { useTheme } from '../hooks/useTheme';
 import { useArduinoData } from '../hooks/useArduinoData';
-
-function generateData(hours: number) {
-  const data = [];
-  const now = new Date();
-  for (let i = hours; i >= 0; i--) {
-    const time = new Date(now.getTime() - i * 3600000);
-    data.push({
-      time: time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
-      soil: 20 + Math.random() * 15,
-      air: 30 + Math.random() * 25,
-      water: 6.5 + Math.random() * 2,
-      temp: 25 + Math.random() * 12,
-      humidity: 45 + Math.random() * 30,
-    });
-  }
-  return data;
-}
 
 const nodesList = [
   { id: 'A1', name: 'Field Station Alpha', location: 'Al-Wafra Farm', status: 'online', battery: 87, signal: 92 },
@@ -85,29 +68,32 @@ export default function Dashboard() {
   const { isDark } = useTheme();
   const { current, history, loading, error } = useArduinoData();
 
-  // Build live metrics from real Arduino data
+  // Nomou V2 live sensor cards. Missing optional channels remain visibly unavailable
+  // instead of being replaced by invented zeroes or demo values.
   const allMetrics = [
-    { label: 'Soil Moisture', value: current.soil_pct,    suffix: '%',   icon: Droplets,     color: '#03A9F4', status: current.soil_cat },
-    { label: 'Air Quality',   value: current.aqi, status: current.aqi_cat, suffix: ' AQI',icon: Wind, color: '#4CAF50'},
-    { label: 'Temperature',   value: current.temperature, suffix: '°C',  decimals: 1, icon: Thermometer, color: '#FF9800', status: '' },
-    { label: 'Humidity',      value: current.humidity,    suffix: '%',   icon: CloudRain,    color: '#4CAF50', status: current.humidity_cat },
-    { label: 'Light Level',   value: current.light_pct,   suffix: '%',   icon: TrendingUp,   color: '#9C27B0', status: current.light_cat },
+    { label: 'Soil Moisture', value: current.soil_pct, suffix: '%', icon: Droplets, color: '#03A9F4', status: current.soil_cat },
+    { label: 'Root Temperature', value: current.soil_temp, suffix: '°C', decimals: 1, icon: Thermometer, color: '#F97316', status: 'DS18B20' },
+    { label: 'Air Temperature', value: current.temperature, suffix: '°C', decimals: 1, icon: Thermometer, color: '#FF9800', status: 'Live' },
+    { label: 'Humidity', value: current.humidity, suffix: '%', icon: CloudRain, color: '#4CAF50', status: current.humidity_cat },
+    { label: 'Pressure', value: current.bmp_pressure, suffix: ' hPa', decimals: 1, icon: Gauge, color: '#64748B', status: 'BMP280' },
+    { label: 'CO₂', value: current.scd_co2 && current.scd_co2 > 0 ? current.scd_co2 : null, suffix: ' ppm', icon: Gauge, color: '#16A34A', status: 'SCD40' },
+    { label: 'NH₃ Signal', value: current.nh3_mv, suffix: ' mV', icon: Radio, color: '#8B5CF6', status: 'Relative signal' },
+    { label: 'TDS', value: current.tds_ppm, suffix: ' ppm', icon: Droplets, color: '#0EA5E9', status: 'Live chemistry' },
+    { label: 'pH', value: current.ph ?? current.ph_mv, suffix: current.ph != null ? '' : current.ph_mv != null ? ' mV' : '', decimals: current.ph != null ? 2 : 0, icon: Droplets, color: '#14B8A6', status: current.ph != null ? 'Direct' : current.ph_mv != null ? 'Electrode signal' : 'Waiting' },
+    { label: 'UV', value: current.uv_mv, suffix: ' mV', icon: TrendingUp, color: '#A855F7', status: 'UV channel' },
+    { label: 'Light', value: current.ldr_mv ?? current.light_pct, suffix: current.ldr_mv != null ? ' mV' : '%', icon: TrendingUp, color: '#EAB308', status: current.light_cat },
   ];
 
-  // Build chart data from Arduino history (last 20 readings every 30s)
-  const data = history.labels.length > 0
-    ? history.labels.map((time, i) => ({
-        time,
-        soil:     history.soil[i]  ?? 0,
-        temp:     history.temp[i]  ?? 0,
-        humidity: history.humid[i] ?? 0,
-        light:    history.light[i] ?? 0,
-        air:      42, // not in Arduino sensors — keep as static
-        water:    7.1,
-      }))
-    : generateData(24); // fallback to mock while loading
+  // Historical chart uses only real stored Nomou readings. No random/demo fallback.
+  const data = history.labels.map((time, i) => ({
+    time,
+    soil: history.soil[i] ?? null,
+    temp: history.temp[i] ?? null,
+    humidity: history.humid[i] ?? null,
+    light: history.light[i] ?? null,
+  }));
   const [selectedRange, setSelectedRange] = useState(24);
-  const [activeMetrics, setActiveMetrics] = useState({ soil: true, air: true, water: true, temp: true, humidity: true });
+  const [activeMetrics, setActiveMetrics] = useState({ soil: true, light: true, temp: true, humidity: true });
   const [showReport, setShowReport] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -313,7 +299,7 @@ export default function Dashboard() {
         </ScrollReveal>
 
         {/* ═══════════════ METRICS ═══════════════ */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-6">
           {allMetrics.map((metric, i) => {
             const Icon = metric.icon;
             return (
@@ -336,7 +322,7 @@ export default function Dashboard() {
                     <span className="w-2.5 h-2.5 rounded-full animate-live-pulse shadow-[0_0_8px_currentColor]" style={{ color: metric.color, backgroundColor: metric.color }} />
                   </div>
                   <div className={`font-mono text-3xl font-bold transition-colors duration-500 ${textMain}`}>
-                    <AnimatedCounter value={metric.value} decimals={metric.decimals || 0} />{metric.suffix}
+                    {metric.value == null ? '—' : <><AnimatedCounter value={metric.value} decimals={metric.decimals || 0} />{metric.suffix}</>}
                   </div>
                   <div className={`text-xs uppercase tracking-wider mt-1 transition-colors duration-500 ${textFaint}`}>{metric.label}</div>
                   <svg className="mt-3 w-full h-6" viewBox="0 0 100 20" preserveAspectRatio="none">
@@ -365,7 +351,7 @@ export default function Dashboard() {
             </div>
 
             <div className="flex flex-wrap gap-2 mb-4">
-              {[{ key: 'soil', label: 'Soil', color: '#03A9F4' }, { key: 'air', label: 'Air', color: '#4CAF50' }, { key: 'temp', label: 'Temp', color: '#FF9800' }, { key: 'humidity', label: 'Humidity', color: '#8BC34A' }].map((metric) => (
+              {[{ key: 'soil', label: 'Soil', color: '#03A9F4' }, { key: 'light', label: 'Light', color: '#EAB308' }, { key: 'temp', label: 'Temp', color: '#FF9800' }, { key: 'humidity', label: 'Humidity', color: '#8BC34A' }].map((metric) => (
                 <motion.button key={metric.key} onClick={() => setActiveMetrics(p => ({ ...p, [metric.key]: !p[metric.key as keyof typeof p] }))}
                   whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.92 }}
                   className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full transition-all ${
@@ -383,7 +369,7 @@ export default function Dashboard() {
             <ResponsiveContainer width="100%" height={400}>
               <AreaChart data={data}>
                 <defs>
-                  {[{ id: 'soilGrad', c: '#03A9F4' }, { id: 'airGrad', c: '#4CAF50' }, { id: 'tempGrad', c: '#FF9800' }, { id: 'humGrad', c: '#8BC34A' }].map(g => (
+                  {[{ id: 'soilGrad', c: '#03A9F4' }, { id: 'lightGrad', c: '#EAB308' }, { id: 'tempGrad', c: '#FF9800' }, { id: 'humGrad', c: '#8BC34A' }].map(g => (
                     <linearGradient key={g.id} id={g.id} x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor={g.c} stopOpacity={isDark ? 0.3 : 0.15} />
                       <stop offset="95%" stopColor={g.c} stopOpacity={0} />
@@ -396,7 +382,7 @@ export default function Dashboard() {
                 <Tooltip contentStyle={{ background: isDark ? 'rgba(10,18,14,0.95)' : 'white', border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E8F5E9', borderRadius: 16, fontSize: 12, backdropFilter: 'blur(10px)' }} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
                 {activeMetrics.soil && <Area type="monotone" dataKey="soil" stroke="#03A9F4" fill="url(#soilGrad)" strokeWidth={2.5} dot={false} name="Soil Moisture" activeDot={{ r: 6, fill: '#03A9F4', stroke: '#fff', strokeWidth: 2 }} />}
-                {activeMetrics.air && <Area type="monotone" dataKey="air" stroke="#4CAF50" fill="url(#airGrad)" strokeWidth={2.5} dot={false} name="Air Quality" activeDot={{ r: 6, fill: '#4CAF50', stroke: '#fff', strokeWidth: 2 }} />}
+                {activeMetrics.light && <Area type="monotone" dataKey="light" stroke="#EAB308" fill="url(#lightGrad)" strokeWidth={2.5} dot={false} name="Light" activeDot={{ r: 6, fill: '#EAB308', stroke: '#fff', strokeWidth: 2 }} />}
                 {activeMetrics.temp && <Area type="monotone" dataKey="temp" stroke="#FF9800" fill="url(#tempGrad)" strokeWidth={2.5} dot={false} name="Temperature" activeDot={{ r: 6, fill: '#FF9800', stroke: '#fff', strokeWidth: 2 }} />}
                 {activeMetrics.humidity && <Area type="monotone" dataKey="humidity" stroke="#8BC34A" fill="url(#humGrad)" strokeWidth={2} dot={false} name="Humidity" activeDot={{ r: 5, fill: '#8BC34A', stroke: '#fff', strokeWidth: 2 }} />}
               </AreaChart>
