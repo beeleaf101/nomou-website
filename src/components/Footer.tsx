@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, Phone, Leaf } from 'lucide-react';
+import { Mail, MapPin, Phone, Leaf, Instagram } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 
 const quickLinks = [
@@ -40,16 +40,15 @@ export default function Footer() {
               Smart environmental monitoring for agriculture and sustainability in Kuwait.
             </p>
             <div className="flex gap-2">
-              {['X', 'in', 'gh', 'ig'].map((social) => (
-                <motion.a key={social} href="#" whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.95 }}
-                  className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold transition-all duration-200 ${
-                    isDark
-                      ? 'bg-white/5 border border-white/10 text-white/50 hover:bg-green-primary hover:text-white hover:border-green-primary'
-                      : 'bg-white border border-gray-200 text-gray-500 hover:bg-green-primary hover:text-white hover:border-green-primary shadow-xs'
-                  }`}>
-                  {social}
-                </motion.a>
-              ))}
+              <motion.a href="https://www.instagram.com/Nomouofficial/" target="_blank" rel="noreferrer"
+                aria-label="Nomouofficial on Instagram" whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.95 }}
+                className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold transition-all duration-200 ${
+                  isDark
+                    ? 'bg-white/5 border border-white/10 text-white/50 hover:bg-green-primary hover:text-white hover:border-green-primary'
+                    : 'bg-white border border-gray-200 text-gray-500 hover:bg-green-primary hover:text-white hover:border-green-primary shadow-xs'
+                }`}>
+                <Instagram size={15} />
+              </motion.a>
             </div>
           </motion.div>
 
@@ -94,7 +93,7 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3">
               {[
-                { icon: Mail, val: 'nomouQ8@gmail.com' },
+                { icon: Mail, val: 'NomouSupport@gmail.com' },
                 { icon: Phone, val: '+965 94448134' },
                 { icon: MapPin, val: 'Kuwait City, Kuwait' },
               ].map((item) => {
@@ -106,7 +105,11 @@ export default function Footer() {
                     }`}>
                       <Icon size={14} className="text-green-primary" />
                     </div>
-                    <span className={`text-sm pt-1 transition-colors duration-500 ${isDark ? 'text-white/40' : 'text-gray-500'}`}>{item.val}</span>
+                    {item.icon === Mail ? (
+                      <a href="mailto:NomouSupport@gmail.com" className={`text-sm pt-1 transition-colors duration-500 hover:text-green-primary ${isDark ? 'text-white/40' : 'text-gray-500'}`}>{item.val}</a>
+                    ) : (
+                      <span className={`text-sm pt-1 transition-colors duration-500 ${isDark ? 'text-white/40' : 'text-gray-500'}`}>{item.val}</span>
+                    )}
                   </li>
                 );
               })}
