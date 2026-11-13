@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import {
   ArrowRight, Eye, TrendingUp, ChevronRight, Leaf, ArrowUpRight,
   Radio, Wifi, Battery, Shield, Cpu, Gauge, Droplets,
-  Wind, Thermometer, CloudRain, type LucideIcon,
+  Thermometer, CloudRain, type LucideIcon,
 } from 'lucide-react';
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -76,14 +76,6 @@ const features: FeatureItem[] = [
 //   { label: 'Humidity', icon: CloudRain, color: '#4CAF50', value: 64, suffix: '%', status: 'Normal' },
 // ];
 
-const chartData = Array.from({ length: 24 }, (_, idx) => ({
-  time: `${idx}:00`,
-  soil: 25 + Math.sin(idx * 0.5) * 5 + Math.random() * 3,
-  air: 40 + Math.cos(idx * 0.3) * 8 + Math.random() * 4,
-  temp: 28 + Math.sin(idx * 0.4 + 1) * 4 + Math.random() * 2,
-  humidity: 55 + Math.cos(idx * 0.35) * 10 + Math.random() * 5,
-}));
-
 /* ------------------------------------------------------------------ */
 /*  TEXT SCRAMBLE                                                      */
 /* ------------------------------------------------------------------ */
@@ -129,21 +121,36 @@ function ScrambleText({ text, className, delay = 0 }: { text: string; className?
 export default function Home() {
   const { isDark } = useTheme();
   const { isLoggedIn } = useAuth();
-  const { current: arduino } = useArduinoData();
+  const { current: arduino, history } = useArduinoData();
 
+  const sensorStatus = (available: boolean, label = 'Live') => available ? label : 'Waiting';
   const metrics = [
-    { label: 'Soil Moisture', icon: Droplets,    color: '#03A9F4', value: arduino.soil_pct,   suffix: '%',    status: arduino.soil_cat    },
-    { label: 'Air Quality',   icon: Wind,        color: '#4CAF50', value: arduino.aqi,         suffix: ' AQI', status: arduino.aqi_cat     },
-    { label: 'Temperature',   icon: Thermometer, color: '#FF9800', value: arduino.temperature, suffix: '°C',   status: arduino.temperature > 37 ? 'High' : 'Normal' },
-    { label: 'Humidity',      icon: CloudRain,   color: '#4CAF50', value: arduino.humidity,    suffix: '%',    status: arduino.humidity_cat },
-    { label: 'Light Level',   icon: TrendingUp,  color: '#9C27B0', value: arduino.light_pct,   suffix: '%',    status: arduino.light_cat   },
+    { label: 'Soil Moisture', icon: Droplets, color: '#03A9F4', value: arduino.soil_pct, suffix: '%', status: arduino.soil_cat },
+    { label: 'Root Temperature', icon: Thermometer, color: '#FF9800', value: arduino.soil_temp ?? '—', suffix: arduino.soil_temp == null ? '' : '°C', status: sensorStatus(arduino.soil_temp != null, 'DS18B20') },
+    { label: 'Air Temperature', icon: Thermometer, color: '#F59E0B', value: arduino.temperature, suffix: '°C', status: arduino.temperature > 37 ? 'High' : 'Live' },
+    { label: 'Humidity', icon: CloudRain, color: '#4CAF50', value: arduino.humidity, suffix: '%', status: arduino.humidity_cat },
+    { label: 'Pressure', icon: Gauge, color: '#64748B', value: arduino.bmp_pressure ?? '—', suffix: arduino.bmp_pressure == null ? '' : ' hPa', status: sensorStatus(arduino.bmp_pressure != null, 'BMP280') },
+    { label: 'CO₂', icon: Gauge, color: '#16A34A', value: arduino.scd_co2 ?? '—', suffix: arduino.scd_co2 == null ? '' : ' ppm', status: sensorStatus(arduino.scd_co2 != null && arduino.scd_co2 > 0, 'SCD40') },
+    { label: 'NH₃ Signal', icon: Radio, color: '#8B5CF6', value: arduino.nh3_mv ?? '—', suffix: arduino.nh3_mv == null ? '' : ' mV', status: sensorStatus(arduino.nh3_mv != null, 'Relative signal') },
+    { label: 'TDS', icon: Droplets, color: '#0EA5E9', value: arduino.tds_ppm ?? '—', suffix: arduino.tds_ppm == null ? '' : ' ppm', status: sensorStatus(arduino.tds_ppm != null) },
+    { label: 'pH', icon: Droplets, color: '#14B8A6', value: arduino.ph != null ? arduino.ph.toFixed(2) : arduino.ph_mv != null ? Math.round(arduino.ph_mv) : '—', suffix: arduino.ph != null ? '' : arduino.ph_mv != null ? ' mV' : '', status: arduino.ph != null ? 'Direct' : arduino.ph_mv != null ? 'Electrode signal' : 'Waiting' },
+    { label: 'UV', icon: TrendingUp, color: '#A855F7', value: arduino.uv_mv ?? '—', suffix: arduino.uv_mv == null ? '' : ' mV', status: sensorStatus(arduino.uv_mv != null, 'Indoor-safe reading') },
+    { label: 'Light', icon: TrendingUp, color: '#EAB308', value: arduino.ldr_mv ?? arduino.light_pct, suffix: arduino.ldr_mv != null ? ' mV' : '%', status: arduino.light_cat },
   ];
+
+  const chartData = history.labels.map((time, idx) => ({
+    time,
+    soil: history.soil[idx] ?? null,
+    temp: history.temp[idx] ?? null,
+    humidity: history.humid[idx] ?? null,
+    light: history.light[idx] ?? null,
+  }));
   // Plain strings (no translation)
   const t = {
     badge: 'Smart Environmental Monitoring',
     headline1: 'Environmental Intelligence for',
     headline2: 'Smarter Agriculture',
-    sub: 'Nomou is an IoT-based monitoring system that helps you track soil, air, and water conditions in real-time.',
+    sub: 'Nomou V2 combines live soil, root-zone, atmospheric, light and chemistry signals with on-device intelligence to turn sensor readings into useful agricultural decisions.',
     btnNodes: 'Explore Our Nodes',
     btnDashboard: 'View Live Dashboard',
     badge1: 'Real-time Monitoring',
@@ -454,7 +461,7 @@ export default function Home() {
               <ResponsiveContainer width="100%" height={360}>
                 <AreaChart data={chartData}>
                   <defs>
-                    {[{ id: 'sg', c: '#03A9F4' }, { id: 'ag', c: '#4CAF50' }, { id: 'tg', c: '#FF9800' }, { id: 'hg', c: '#8BC34A' }].map(g => (
+                    {[{ id: 'sg', c: '#03A9F4' }, { id: 'lg', c: '#EAB308' }, { id: 'tg', c: '#FF9800' }, { id: 'hg', c: '#8BC34A' }].map(g => (
                       <linearGradient key={g.id} id={g.id} x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor={g.c} stopOpacity={isDark ? 0.5 : 0.3} />
                         <stop offset="95%" stopColor={g.c} stopOpacity={0} />
@@ -480,13 +487,13 @@ export default function Home() {
                     );
                   }} />
                   <Area type="monotone" dataKey="soil" stroke="#03A9F4" fill="url(#sg)" strokeWidth={3} name="Soil Moisture" dot={{ r: 0 }} activeDot={{ r: 6, fill: '#03A9F4', stroke: '#fff', strokeWidth: 2 }} />
-                  <Area type="monotone" dataKey="air" stroke="#4CAF50" fill="url(#ag)" strokeWidth={3} name="Air Quality" dot={{ r: 0 }} activeDot={{ r: 6, fill: '#4CAF50', stroke: '#fff', strokeWidth: 2 }} />
+                  <Area type="monotone" dataKey="light" stroke="#EAB308" fill="url(#lg)" strokeWidth={3} name="Light" dot={{ r: 0 }} activeDot={{ r: 6, fill: '#EAB308', stroke: '#fff', strokeWidth: 2 }} />
                   <Area type="monotone" dataKey="temp" stroke="#FF9800" fill="url(#tg)" strokeWidth={3} name="Temperature" dot={{ r: 0 }} activeDot={{ r: 6, fill: '#FF9800', stroke: '#fff', strokeWidth: 2 }} />
                   <Area type="monotone" dataKey="humidity" stroke="#8BC34A" fill="url(#hg)" strokeWidth={2} name="Humidity" dot={{ r: 0 }} activeDot={{ r: 5, fill: '#8BC34A', stroke: '#fff', strokeWidth: 2 }} />
                 </AreaChart>
               </ResponsiveContainer>
               <div className="flex flex-wrap gap-3 mt-5 justify-center">
-                {[{ c: '#03A9F4', l: 'Soil Moisture' }, { c: '#4CAF50', l: 'Air Quality' }, { c: '#FF9800', l: 'Temperature °C' }, { c: '#8BC34A', l: 'Humidity %' }].map(item => (
+                {[{ c: '#03A9F4', l: 'Soil Moisture' }, { c: '#EAB308', l: 'Light' }, { c: '#FF9800', l: 'Temperature °C' }, { c: '#8BC34A', l: 'Humidity %' }].map(item => (
                   <div key={item.l} className={`flex items-center gap-2 rounded-full px-3.5 py-1.5 border transition-colors duration-500 ${
                     isDark ? 'bg-white/5 border-white/5' : 'bg-off-white border-gray-100'
                   }`}>
