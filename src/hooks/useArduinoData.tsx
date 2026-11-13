@@ -40,9 +40,15 @@ export interface SensorCurrent {
   ldr_mv?: number | null;
   nh3_mv?: number | null;
   soil_temp?: number | null;
+  bmp_temp?: number | null;
   bmp_pressure?: number | null;
+  dht_temp?: number | null;
+  dht_rh?: number | null;
+  scd_temp?: number | null;
+  scd_rh?: number | null;
   scd_co2?: number | null;
   tds_ppm?: number | null;
+  ph_mv?: number | null;
   ph?: number | null;
   uv_mv?: number | null;
   aqi: number;
@@ -114,12 +120,18 @@ export function useArduinoData() {
         light_cat:    d.light_cat ?? (Number.isFinite(Number(d.ldr_mv)) ? 'Raw mV only' : '--'),
         ldr_mv:       optionalNumber(d.ldr_mv),
         nh3_mv:       optionalNumber(d.nh3_mv),
-        soil_temp:       optionalNumber(d.soil_temp),
-        bmp_pressure:       optionalNumber(d.bmp_pressure),
-        scd_co2:       optionalNumber(d.scd_co2),
-        tds_ppm:       optionalNumber(d.tds_ppm),
-        ph:       optionalNumber(d.ph),
-        uv_mv:       optionalNumber(d.uv_mv),
+        soil_temp:    optionalNumber(d.soil_temp),
+        bmp_temp:     optionalNumber(d.bmp_temp),
+        bmp_pressure: optionalNumber(d.bmp_pressure),
+        dht_temp:     optionalNumber(d.dht_temp),
+        dht_rh:       optionalNumber(d.dht_rh),
+        scd_temp:     optionalNumber(d.scd_temp),
+        scd_rh:       optionalNumber(d.scd_rh),
+        scd_co2:      optionalNumber(d.scd_co2),
+        tds_ppm:      optionalNumber(d.tds_ppm),
+        ph_mv:        optionalNumber(d.ph_mv),
+        ph:           optionalNumber(d.ph),
+        uv_mv:        optionalNumber(d.uv_mv),
         aqi:          aqiRef.current.aqi,
         aqi_cat:      aqiRef.current.aqi_cat,
         online:       true,
