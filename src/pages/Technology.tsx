@@ -1,37 +1,50 @@
 import { useRef } from 'react';
 import { Link } from 'react-router';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Activity, CloudRain, Zap, Shield, Wifi, Cpu, Battery, Radio, Signal, Globe, Droplets, Layers, Microchip } from 'lucide-react';
+import { ArrowRight, Activity, CloudRain, Zap, Shield, Wifi, Cpu, Battery, Radio, Signal, Globe, Droplets, Layers, Microchip, Thermometer, Gauge, Sun, FlaskConical } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
 import { useTheme } from '../hooks/useTheme';
 
 const specs = [
-  { spec: 'Microcontroller', prototype: 'ESP32 DevKit', semipro: 'ESP32-WROOM', professional: 'ESP32-S3' },
-  { spec: 'Connectivity', prototype: 'WiFi', semipro: 'WiFi + BT', professional: 'WiFi + LoRa + 4G' },
-  { spec: 'Sensors', prototype: '3-in-1', semipro: '5-in-1', professional: '7-in-1' },
-  { spec: 'Enclosure', prototype: 'None', semipro: 'IP65 Plastic', professional: 'IP67 Aluminum' },
-  { spec: 'Power', prototype: 'USB', semipro: '18650 Battery', professional: 'Solar + Battery' },
-  { spec: 'Battery Life', prototype: 'N/A', semipro: '7 days', professional: '30+ days' },
-  { spec: 'Data Interval', prototype: '5 min', semipro: '1 min', professional: '30 sec' },
-  { spec: 'Range', prototype: '50m WiFi', semipro: '100m WiFi', professional: '5km LoRa' },
+  { spec: 'Microcontroller', prototype: 'ESP32 DevKit', semipro: 'ESP32-C3', professional: 'ESP32-S3 / scalable controller' },
+  { spec: 'Connectivity', prototype: 'WiFi', semipro: 'WiFi + cloud sync', professional: 'WiFi + LoRa + cellular options' },
+  { spec: 'Sensor Suite', prototype: 'Basic soil + climate', semipro: 'Nomou V2 multi-sensor suite', professional: 'Expanded modular suite' },
+  { spec: 'Soil Data', prototype: 'Moisture', semipro: 'Moisture + root temperature + TDS + pH', professional: 'Extended soil chemistry + profiling' },
+  { spec: 'Atmospheric Data', prototype: 'Temperature + humidity', semipro: 'Temperature + humidity + pressure + CO₂', professional: 'Expanded microclimate sensing' },
+  { spec: 'Exposure Data', prototype: 'Basic light', semipro: 'LDR light + UV + NH₃ response', professional: 'Expanded environmental sensing' },
+  { spec: 'Power', prototype: 'USB cable', semipro: 'Built-in power bank', professional: 'Battery + solar options' },
+  { spec: 'Intelligence', prototype: 'Raw readings', semipro: 'Soil Passport + live derived insights', professional: 'Multi-node predictive analytics' },
 ];
 
 const bottomFeatures = [
-  { icon: Activity, title: 'Real-time Monitoring', desc: 'Continuous data from soil, air, water & weather sensors streaming 24/7', color: '#4CAF50' },
-  { icon: CloudRain, title: 'Smart & Connected', desc: 'IoT technology that keeps you informed anywhere in the world', color: '#03A9F4' },
-  { icon: Zap, title: 'Energy Efficient', desc: 'Low power design for longer field performance with solar charging', color: '#FF9800' },
-  { icon: Shield, title: 'Built for All Conditions', desc: 'Weatherproof, durable and ready for the harshest outdoor environments', color: '#8BC34A' },
+  { icon: Activity, title: 'Live V2 Monitoring', desc: 'Continuous soil, root-zone, atmospheric, light and chemistry signals in one live view.', color: '#4CAF50' },
+  { icon: Cpu, title: 'Soil Passport Intelligence', desc: 'Transforms live readings and recent trends into soil readiness, irrigation and crop-fit insights.', color: '#03A9F4' },
+  { icon: Layers, title: 'Measured + Calculated', desc: 'Keeps direct sensor readings separate from transparent calculated indicators so users know where each result comes from.', color: '#FF9800' },
+  { icon: Shield, title: 'Decision Support', desc: 'VPD, moisture trend, root-zone condition, condensation, aeration and environmental suitability are calculated from the available V2 evidence.', color: '#8BC34A' },
 ];
 
 const techStack = [
-  { icon: Cpu, label: 'ESP32 Microcontroller', desc: 'Dual-core 240MHz processor with built-in WiFi & Bluetooth 5.0' },
-  { icon: Wifi, label: 'Multi-Protocol Wireless', desc: 'WiFi, LoRaWAN, and 4G LTE connectivity options for any deployment' },
-  { icon: Droplets, label: '7 Sensor Types', desc: 'Soil, air, water, temperature, humidity, light, and barometric pressure' },
-  { icon: Battery, label: '30+ Day Battery', desc: 'Solar-powered with ultra-low power consumption design' },
-  { icon: Signal, label: '5km Wireless Range', desc: 'LoRa long-range communication for remote field deployments' },
-  { icon: Globe, label: 'Cloud Connected', desc: 'Real-time data sync to secure cloud dashboard via HTTPS' },
-  { icon: Layers, label: 'Edge Computing', desc: 'On-device data processing and filtering before cloud transmission' },
-  { icon: Microchip, label: 'OTA Updates', desc: 'Over-the-air firmware updates keep nodes current without field visits' },
+  { icon: Cpu, label: 'ESP32-C3 Controller', desc: 'The Nomou V2 node uses the ESP32-C3 to acquire, process and transmit its live sensor stream.' },
+  { icon: Wifi, label: 'WiFi Connected', desc: 'Live V2 readings synchronize with the Nomou API, website dashboard and mobile application.' },
+  { icon: Droplets, label: 'Multi-Sensor Soil Evidence', desc: 'Moisture, root-zone temperature, TDS and pH channels build a richer view of soil behavior.' },
+  { icon: CloudRain, label: 'Microclimate Fusion', desc: 'DHT11, BMP280 and SCD40 readings contribute temperature, humidity, pressure and CO₂ evidence.' },
+  { icon: Sun, label: 'Light + UV Exposure', desc: 'LDR and UV channels track relative exposure; low indoor UV remains a valid sensor reading rather than a fault.' },
+  { icon: FlaskConical, label: 'NH₃ Response', desc: 'The Fermion MEMS NH₃ channel adds a relative chemistry signal used by Nomou calculations.' },
+  { icon: Battery, label: 'Built-in Power Bank', desc: 'Nomou V2 is portable and self-powered through its integrated power-bank setup.' },
+  { icon: Layers, label: 'Soil Intelligence Layer', desc: 'On-device and application logic combines measured data, trends and calculated decision-support indicators.' },
+];
+
+const v2Sensors = [
+  { icon: Droplets, name: 'Capacitive Soil Moisture', data: 'Root-zone moisture %', detail: 'Tracks current water availability and dry-down behavior.' },
+  { icon: Thermometer, name: 'DS18B20', data: 'Soil / root temperature', detail: 'Measures root-zone temperature for stress, uptake and aeration models.' },
+  { icon: Gauge, name: 'BMP280', data: 'Pressure + temperature', detail: 'Adds atmospheric pressure and a supporting temperature channel.' },
+  { icon: CloudRain, name: 'DHT11', data: 'Air temperature + humidity', detail: 'Provides ambient climate data used in VPD and environmental-condition calculations.' },
+  { icon: Globe, name: 'SCD40', data: 'CO₂ + temperature + humidity', detail: 'Adds direct CO₂ concentration when available plus redundant climate evidence.' },
+  { icon: Sun, name: 'LDR', data: 'Ambient light signal', detail: 'Tracks relative light exposure for photosynthesis-environment and crop-fit calculations.' },
+  { icon: FlaskConical, name: 'Fermion MEMS NH₃', data: 'NH₃ relative response', detail: 'Contributes a live relative chemistry signal to Nomou nutrient/environment models.' },
+  { icon: Droplets, name: 'TDS Channel', data: 'TDS ppm', detail: 'Adds dissolved-solids screening data when the probe is active.' },
+  { icon: FlaskConical, name: 'pH Channel', data: 'pH / electrode signal', detail: 'Shows direct pH when available and can retain the electrode signal transparently while modeling.' },
+  { icon: Sun, name: 'UV Channel', data: 'UV sensor signal', detail: 'Tracks UV exposure; indoor low readings are treated as valid context, not missing data.' },
 ];
 
 function Particle({ i, isDark }: { i: number; isDark: boolean }) {
@@ -122,6 +135,34 @@ export default function Technology() {
         </div>
       </section>
 
+      {/* ═══════════════ NOMOU V2 SENSOR SUITE ═══════════════ */}
+      <section className={`py-28 transition-colors duration-500 ${bg}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <ScrollReveal className="text-center mb-14">
+            <span className={`text-xs font-bold uppercase tracking-[0.2em] ${isDark ? 'text-lime' : 'text-green-primary'}`}>Nomou V2</span>
+            <h2 className={`text-4xl sm:text-5xl font-black mt-2 mb-4 ${text}`}>What the V2 node actually measures</h2>
+            <p className={`max-w-3xl mx-auto ${textMuted}`}>V2 combines direct sensor channels with transparent calculated intelligence. Every calculated insight is built from the live evidence available to the node.</p>
+          </ScrollReveal>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
+            {v2Sensors.map((sensor, i) => {
+              const Icon = sensor.icon;
+              return (
+                <ScrollReveal key={sensor.name} delay={i * 0.04}>
+                  <motion.div whileHover={{ y: -8, scale: 1.02 }} className={`h-full p-5 rounded-2xl border transition-all ${cardBg}`}>
+                    <div className="w-11 h-11 rounded-xl bg-green-primary/10 flex items-center justify-center mb-4">
+                      <Icon size={21} className="text-green-primary" />
+                    </div>
+                    <h3 className={`font-bold text-sm mb-1 ${text}`}>{sensor.name}</h3>
+                    <p className="text-xs font-bold text-green-primary mb-2">{sensor.data}</p>
+                    <p className={`text-xs leading-relaxed ${textMuted}`}>{sensor.detail}</p>
+                  </motion.div>
+                </ScrollReveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* ═══════════════ SPECS TABLE ═══════════════ */}
       <section className={`py-32 transition-colors duration-500 ${bg}`}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -140,7 +181,7 @@ export default function Technology() {
                     <tr className={`transition-colors duration-500 ${isDark ? 'bg-gradient-to-r from-[#1B5E20] to-[#2D7A3E]' : 'bg-gradient-to-r from-[#1B5E20] to-[#2D7A3E]'} text-white`}>
                       <th className="text-left px-6 py-5 font-bold">Specification</th>
                       <th className="text-center px-6 py-5 font-bold">Prototype</th>
-                      <th className="text-center px-6 py-5 font-bold">Semi-Pro</th>
+                      <th className="text-center px-6 py-5 font-bold">Nomou V2</th>
                       <th className="text-center px-6 py-5 font-bold">Professional</th>
                     </tr>
                   </thead>
