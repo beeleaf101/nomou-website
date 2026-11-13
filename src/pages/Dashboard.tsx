@@ -92,6 +92,7 @@ export default function Dashboard() {
     humidity: history.humid[i] ?? null,
     light: history.light[i] ?? null,
   }));
+  const activeV2Count = allMetrics.filter(metric => metric.value != null).length;
   const [selectedRange, setSelectedRange] = useState(24);
   const [activeMetrics, setActiveMetrics] = useState({ soil: true, light: true, temp: true, humidity: true });
   const [showReport, setShowReport] = useState(false);
@@ -325,10 +326,10 @@ export default function Dashboard() {
                     {metric.value == null ? '—' : <><AnimatedCounter value={metric.value} decimals={metric.decimals || 0} />{metric.suffix}</>}
                   </div>
                   <div className={`text-xs uppercase tracking-wider mt-1 transition-colors duration-500 ${textFaint}`}>{metric.label}</div>
-                  <svg className="mt-3 w-full h-6" viewBox="0 0 100 20" preserveAspectRatio="none">
-                    <path d={`M0,${15 + Math.random() * 5} Q10,${5 + Math.random() * 10} 20,${10 + Math.random() * 8} T40,${5 + Math.random() * 10} T60,${12 + Math.random() * 6} T80,${4 + Math.random() * 8} T100,${8 + Math.random() * 6}`}
-                      fill="none" stroke={metric.color} strokeWidth="2" opacity="0.4" />
-                  </svg>
+                  <div className="flex items-center gap-1.5 mt-3">
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: metric.value == null ? '#94A3B8' : metric.color }} />
+                    <span className={`text-[10px] font-medium ${metric.value == null ? textFaint : textMuted}`}>{metric.value == null ? 'Waiting for channel' : metric.status}</span>
+                  </div>
                 </motion.div>
               </ScrollReveal>
             );
@@ -483,17 +484,16 @@ export default function Dashboard() {
               </div>
 
               <div>
-                <p className={`text-xs uppercase tracking-wider mb-3 transition-colors duration-500 ${textFaint}`}>24h Air Quality Trend</p>
-                <svg className="w-full h-12" viewBox="0 0 100 20" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="airGradDash" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#4CAF50" stopOpacity="0.2" />
-                      <stop offset="100%" stopColor="#4CAF50" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M0,12 Q5,8 10,10 T20,6 T30,10 T40,7 T50,11 T60,5 T70,9 T80,6 T90,10 T100,8" fill="none" stroke="#4CAF50" strokeWidth="1.5" opacity="0.6" />
-                  <path d="M0,12 Q5,8 10,10 T20,6 T30,10 T40,7 T50,11 T60,5 T70,9 T80,6 T90,10 T100,8 V20 H0 Z" fill="url(#airGradDash)" />
-                </svg>
+                <p className={`text-xs uppercase tracking-wider mb-3 transition-colors duration-500 ${textFaint}`}>Nomou V2 Sensor Availability</p>
+                <div className={`rounded-xl p-4 border ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-pale-green/40 border-green-primary/10'}`}>
+                  <div className="flex items-end justify-between gap-3 mb-2">
+                    <span className={`text-2xl font-black font-mono ${textMain}`}>{activeV2Count}/{allMetrics.length}</span>
+                    <span className="text-xs font-bold text-green-primary">{Math.round((activeV2Count / allMetrics.length) * 100)}% reporting</span>
+                  </div>
+                  <div className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-white'}`}>
+                    <div className="h-full bg-green-primary rounded-full" style={{ width: `${(activeV2Count / allMetrics.length) * 100}%` }} />
+                  </div>
+                </div>
               </div>
             </motion.div>
           </ScrollReveal>
