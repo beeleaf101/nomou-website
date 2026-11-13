@@ -30,9 +30,9 @@ const teamMembers = [
   { name: 'Laila Muhanna', role: 'CEO & Marketing', bio: 'Driving NOMOU\'s vision and leading marketing strategy to bring smart agriculture to every farm across Kuwait.', initials: 'LM', color: '#FF9800' },
   { name: 'Ragued CherChari', role: 'CTO & Founder', bio: 'Founding NOMOU and architecting the IoT platform and cloud infrastructure that powers every node.', initials: 'RC', color: '#1B5E20' },
   { name: 'Hamad Mubarak', role: 'CBO', bio: 'Leading business operations and growth strategy, building partnerships that expand NOMOU\'s reach across the region.', initials: 'HM', color: '#03A9F4' },
-  { name: 'Faisal Almuneer', role: 'CFO', bio: 'Overseeing financial strategy, planning and operations to ensure NOMOU\'s sustainable growth and stability.', initials: 'FA', color: '#8BC34A' },
+  { name: 'Faisal Almuneer', role: 'CAO', bio: 'Leading NOMOU\'s administrative operations, internal coordination and organizational support so the team can execute efficiently as the platform grows.', initials: 'FA', color: '#8BC34A' },
   { name: 'Ritaj CherChari', role: 'CDO', bio: 'Leading NOMOU\'s data strategy and analytics infrastructure, transforming raw sensor streams into meaningful insights that empower farmers to make smarter, data-driven decisions.', initials: 'RC', color: '#2D7A3E' },
-  { name: 'Mohammad Aaref', role: 'COO & CAO', bio: 'Overseeing day-to-day operations and cross-functional coordination to ensure NOMOUs teams, systems and deployments run smoothly and efficiently across Kuwait.', initials: 'MA', color: '#7B1FA2' },
+  { name: 'Mohammad Aaref', role: 'CFO', bio: 'Overseeing NOMOU\'s financial planning, budgeting and financial operations to support sustainable growth and responsible expansion.', initials: 'MA', color: '#7B1FA2' },
 ];
 
 /* ── COUNT UP ────────────────────────────────────────── */
