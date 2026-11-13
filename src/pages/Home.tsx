@@ -53,18 +53,18 @@ interface MetricItem {
 const nodes: NodeItem[] = [
   { level: '01', name: 'Prototype Node', tags: 'Learn. Build. Experiment.', image: '/images/node-prototype.png',
     features: ['ESP32 DevKit', 'Breadboard Setup', 'Basic Sensors', 'USB Powered'], bestFor: 'Students & Hobbyists', color: '#03A9F4' },
-  { level: '02', name: 'Semi-Professional', tags: 'Field Test. Compete. Validate.', image: '/images/node-semipro.png',
-    features: ['Custom PCB', 'IP65 Enclosure', 'Battery Power', 'Enhanced Sensors'], bestFor: 'Research & Competitions', color: '#2D7A3E' },
+  { level: '02', name: 'Nomou V2', tags: 'Sense. Calculate. Decide.', image: '/images/node-semipro.png',
+    features: ['ESP32-C3', 'Built-in Power Bank', 'V2 Multi-Sensor Suite', 'Soil Passport Intelligence'], bestFor: 'Smart Agriculture & Demonstrations', color: '#2D7A3E' },
   { level: '03', name: 'Professional Node', tags: 'Scale. Deploy. Monitor.', image: '/images/node-professional.png',
     features: ['All-in-One Design', 'Solar + Battery', 'LoRa / 4G / WiFi', '30+ Day Runtime'], bestFor: 'Commercial Agriculture', color: '#1B5E20' },
 ];
 
 const features: FeatureItem[] = [
-  { icon: Radio, title: 'Real-time Monitoring', desc: 'Live data from soil, air, water & weather sensors streaming every 30 seconds', color: '#03A9F4' },
+  { icon: Radio, title: 'Real-time V2 Monitoring', desc: 'Live soil, root-zone, climate, CO₂, light, UV and chemistry signals in one connected stream', color: '#03A9F4' },
   { icon: Wifi, title: 'Multi-Protocol Connectivity', desc: 'WiFi, LoRa, 4G — your data reaches the cloud no matter where your fields are', color: '#4CAF50' },
   { icon: Battery, title: '30+ Day Battery Life', desc: 'Solar-ready ultra-low power design keeps nodes running in the remotest fields', color: '#FF9800' },
   { icon: Shield, title: 'IP67 Weatherproof', desc: "Engineered to survive Kuwait's scorching heat, dust storms, and flash floods", color: '#8BC34A' },
-  { icon: Cpu, title: 'Edge Intelligence', desc: 'On-device processing filters noise and sends only actionable insights to the cloud', color: '#1B5E20' },
+  { icon: Cpu, title: 'Soil Passport Intelligence', desc: 'Measured readings, trends and calculated indicators are combined into clear soil and crop decision support', color: '#1B5E20' },
   { icon: Gauge, title: 'Predictive Analytics', desc: 'AI-powered forecasting helps you irrigate before your crops show stress', color: '#2D7A3E' },
 ];
 
