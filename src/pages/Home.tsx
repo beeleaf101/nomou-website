@@ -68,14 +68,6 @@ const features: FeatureItem[] = [
   { icon: Gauge, title: 'Predictive Analytics', desc: 'AI-powered forecasting helps you irrigate before your crops show stress', color: '#2D7A3E' },
 ];
 
-// const metrics: MetricItem[] = [
-//   { label: 'Soil Moisture', icon: Droplets, color: '#03A9F4', value: 28, suffix: '%', status: 'Optimal' },
-//   { label: 'Air Quality', icon: Wind, color: '#4CAF50', value: 42, suffix: ' AQI', status: 'Good' },
-//   { label: 'Water pH', icon: CloudRain, color: '#03A9F4', value: 7.24, suffix: '', status: 'Good', decimals: 2 },
-//   { label: 'Temperature', icon: Thermometer, color: '#FF9800', value: 31.2, suffix: '°C', status: 'Normal', decimals: 1 },
-//   { label: 'Humidity', icon: CloudRain, color: '#4CAF50', value: 64, suffix: '%', status: 'Normal' },
-// ];
-
 /* ------------------------------------------------------------------ */
 /*  TEXT SCRAMBLE                                                      */
 /* ------------------------------------------------------------------ */
