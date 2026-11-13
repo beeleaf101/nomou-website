@@ -23,13 +23,13 @@ const nodes = [
       { icon: Cpu, label: '3 Sensors' },
     ],
   },
-  { level: '02', name: 'Semi-Professional', subtitle: 'Field Test. Compete. Validate.', image: '/images/node-semipro.png',
-    features: ['Custom PCB & Organized Layout', 'Enclosure for Protection (IP65)', 'Enhanced Sensors & Stability', 'Battery Powered & Portable'],
-    bestFor: 'Field Testing & Competitions', color: '#2D7A3E',
+  { level: '02', name: 'Nomou V2', subtitle: 'Sense. Calculate. Decide.', image: '/images/node-semipro.png',
+    features: ['ESP32-C3 smart node', 'Soil moisture + DS18B20 root temperature', 'BMP280 + DHT11 + SCD40 climate suite', 'LDR + UV + NH₃ + TDS + pH channels', 'Built-in power bank', 'Soil Passport & calculated intelligence'],
+    bestFor: 'Smart Agriculture & Demonstrations', color: '#2D7A3E',
     specs: [
-      { icon: Wifi, label: 'WiFi + BT' },
-      { icon: Battery, label: 'Battery 7d' },
-      { icon: Cpu, label: '5 Sensors' },
+      { icon: Wifi, label: 'WiFi Connected' },
+      { icon: Battery, label: 'Built-in Power Bank' },
+      { icon: Cpu, label: 'V2 Multi-Sensor Suite' },
     ],
   },
   { level: '03', name: 'Professional Node', subtitle: 'Scale. Deploy. Monitor.', image: '/images/node-professional.png',
@@ -48,11 +48,16 @@ const comparisonFeatures = [
   { name: 'Bluetooth', proto: false, semipro: true, pro: true },
   { name: 'LoRa / 4G', proto: false, semipro: false, pro: true },
   { name: 'Soil Moisture', proto: true, semipro: true, pro: true },
-  { name: 'Air Quality', proto: true, semipro: true, pro: true },
-  { name: 'Water Quality', proto: true, semipro: true, pro: true },
-  { name: 'Temp & Humidity', proto: true, semipro: true, pro: true },
-  { name: 'Light / UV Sensor', proto: false, semipro: true, pro: true },
-  { name: 'Barometric Pressure', proto: false, semipro: false, pro: true },
+  { name: 'Root-zone Temperature', proto: false, semipro: true, pro: true },
+  { name: 'Air Temperature & Humidity', proto: true, semipro: true, pro: true },
+  { name: 'Barometric Pressure', proto: false, semipro: true, pro: true },
+  { name: 'CO₂ (SCD40)', proto: false, semipro: true, pro: true },
+  { name: 'Light / LDR', proto: false, semipro: true, pro: true },
+  { name: 'UV Channel', proto: false, semipro: true, pro: true },
+  { name: 'NH₃ Relative Signal', proto: false, semipro: true, pro: true },
+  { name: 'TDS Channel', proto: false, semipro: true, pro: true },
+  { name: 'pH Channel', proto: false, semipro: true, pro: true },
+  { name: 'Soil Passport Intelligence', proto: false, semipro: true, pro: true },
   { name: 'Weatherproof', proto: false, semipro: true, pro: true },
   { name: 'Solar Power', proto: false, semipro: false, pro: true },
   { name: 'OTA Updates', proto: false, semipro: true, pro: true },
@@ -234,7 +239,7 @@ export default function NodesPage() {
                     <tr className={`transition-colors duration-500 ${isDark ? 'bg-gradient-to-r from-[#1B5E20] to-[#2D7A3E]' : 'bg-gradient-to-r from-[#1B5E20] to-[#2D7A3E]'} text-white`}>
                       <th className="text-left px-6 py-5 font-bold text-sm">Feature</th>
                       <th className="text-center px-6 py-5 font-bold">Prototype</th>
-                      <th className="text-center px-6 py-5 font-bold">Semi-Pro</th>
+                      <th className="text-center px-6 py-5 font-bold">Nomou V2</th>
                       <th className="text-center px-6 py-5 font-bold">Professional</th>
                     </tr>
                   </thead>
