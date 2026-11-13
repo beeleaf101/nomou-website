@@ -1,15 +1,16 @@
 import { useState, useRef } from 'react';
 import { Link } from 'react-router';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle, MessageSquare, Users, FlaskConical, ArrowRight, ExternalLink } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Send, CheckCircle, MessageSquare, Users, FlaskConical, ArrowRight, ExternalLink, Instagram } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
 import { useTheme } from '../hooks/useTheme';
 
 const contactInfo = [
-  { icon: Mail, label: 'Email', value: 'nomouQ8@gmail.com', href: 'mailto:info@nomou.io' },
+  { icon: Mail, label: 'Support Email', value: 'NomouSupport@gmail.com', href: 'mailto:NomouSupport@gmail.com' },
   { icon: Phone, label: 'Phone', value: '+965 94448134', href: 'tel:+96512345678' },
   { icon: MapPin, label: 'Address', value: 'Kuwait City, State of Kuwait', href: '#' },
   { icon: Clock, label: 'Hours', value: 'Sun - Thu: 8:00 AM - 5:00 PM', href: '#' },
+  { icon: Instagram, label: 'Instagram', value: '@Nomouofficial', href: 'https://www.instagram.com/Nomouofficial/' },
 ];
 
 const inquiryTypes = ['General Inquiry', 'Sales & Partnership', 'Technical Support', 'Research Collaboration', 'Media & Press'];
@@ -124,12 +125,13 @@ export default function Contact() {
               <div>
                 <p className={`text-xs font-bold uppercase tracking-wider mb-4 transition-colors duration-500 ${textFaint}`}>Follow Us</p>
                 <div className="flex gap-3">
-                  {['X', 'in', 'gh', 'ig'].map((social) => (
-                    <motion.a key={social} href="#" whileHover={{ y: -6, scale: 1.15 }} whileTap={{ scale: 0.9 }}
-                      className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold text-xs transition-all ${
-                        isDark ? 'bg-white/5 border border-white/10 text-white/50 hover:bg-green-primary hover:text-white hover:border-green-primary hover:shadow-[0_0_15px_rgba(76,175,80,0.2)]' : 'bg-pale-green text-green-primary hover:bg-green-primary hover:text-white hover:shadow-glow-green'
-                      }`}>{social}</motion.a>
-                  ))}
+                  <motion.a href="https://www.instagram.com/Nomouofficial/" target="_blank" rel="noreferrer"
+                    aria-label="Nomouofficial on Instagram" whileHover={{ y: -6, scale: 1.15 }} whileTap={{ scale: 0.9 }}
+                    className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold text-xs transition-all ${
+                      isDark ? 'bg-white/5 border border-white/10 text-white/50 hover:bg-green-primary hover:text-white hover:border-green-primary hover:shadow-[0_0_15px_rgba(76,175,80,0.2)]' : 'bg-pale-green text-green-primary hover:bg-green-primary hover:text-white hover:shadow-glow-green'
+                    }`}>
+                    <Instagram size={19} />
+                  </motion.a>
                 </div>
               </div>
             </ScrollReveal>
