@@ -1,6 +1,6 @@
 export default function DataStream() {
   const dataText =
-    'SOIL: 28% | AIR: 42 AQI | WATER: 7.24 pH | TEMP: 31.2°C | HUM: 64% | SOIL: 28% | AIR: 42 AQI | WATER: 7.24 pH | TEMP: 31.2°C | HUM: 64% | SOIL: 28% | AIR: 42 AQI | WATER: 7.24 pH | TEMP: 31.2°C | HUM: 64% | SOIL: 28% | AIR: 42 AQI | WATER: 7.24 pH | TEMP: 31.2°C | HUM: 64% | ';
+    'NOMOU V2 • SOIL MOISTURE • ROOT TEMPERATURE • AIR TEMPERATURE • HUMIDITY • PRESSURE • LIGHT • NH₃ • CO₂ • TDS • pH • UV • LIVE SOIL INTELLIGENCE • ';
 
   return (
     <div className="w-full h-12 bg-forest overflow-hidden flex items-center relative">
