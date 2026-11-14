@@ -19,7 +19,7 @@ const contactOptions = [
   { icon: MessageSquare, title: 'Email Support', desc: 'Need help with Nomou, the app, a node or your sensor data? Contact the support team directly.', action: 'Email Support', href: 'mailto:NomouSupport@gmail.com' },
   { icon: Users, title: 'Partnerships', desc: 'Interested in distributing or integrating NOMOU into your operations?', action: 'Learn More', href: '#' },
   { icon: FlaskConical, title: 'Research', desc: 'Collaborate with us on environmental research and data projects.', action: 'Get in Touch', href: '/research' },
-  { icon: ExternalLink, title: 'Documentation', desc: 'Find answers in our comprehensive developer and user documentation.', action: 'View Docs', href: '#' },
+  { icon: ExternalLink, title: 'Documentation', desc: 'Read the Nomou final project report, methodology, validation and current V2 implementation notes.', action: 'View Docs', href: '/documentation' },
 ];
 
 function Particle({ i, isDark }: { i: number; isDark: boolean }) {
@@ -43,6 +43,9 @@ export default function Contact() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const subject = formData.subject || 'Nomou website inquiry';
+    const body = `Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`;
+    window.location.href = `mailto:NomouSupport@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     setSubmitted(true);
     setTimeout(() => { setSubmitted(false); setFormData({ name: '', email: '', subject: '', message: '' }); }, 4000);
   };
