@@ -12,10 +12,10 @@ const quickLinks = [
 ];
 
 const resources = [
-  { name: 'Documentation', path: '#' },
-  { name: 'API Reference', path: '#' },
-  { name: 'Research Papers', path: '/research' },
-  { name: 'FAQ', path: '#' },
+  { name: 'Documentation', path: '/documentation' },
+  { name: 'API Reference', path: '/api-reference' },
+  { name: 'Research & References', path: '/research' },
+  { name: 'FAQ', path: '/faq' },
 ];
 
 export default function Footer() {
@@ -125,9 +125,9 @@ export default function Footer() {
             &copy; 2026 Nomou. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-sm">
-            <a href="#" className={`transition-colors ${isDark ? 'text-white/30 hover:text-green-light' : 'text-gray-400 hover:text-green-primary'}`}>Privacy Policy</a>
+            <Link to="/privacy" className={`transition-colors ${isDark ? 'text-white/30 hover:text-green-light' : 'text-gray-400 hover:text-green-primary'}`}>Privacy Policy</Link>
             <span className={isDark ? 'text-white/10' : 'text-gray-200'}>|</span>
-            <a href="#" className={`transition-colors ${isDark ? 'text-white/30 hover:text-green-light' : 'text-gray-400 hover:text-green-primary'}`}>Terms of Service</a>
+            <Link to="/terms" className={`transition-colors ${isDark ? 'text-white/30 hover:text-green-light' : 'text-gray-400 hover:text-green-primary'}`}>Terms of Service</Link>
           </div>
         </div>
       </div>
