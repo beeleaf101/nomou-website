@@ -1,0 +1,20 @@
+import { ShieldCheck } from 'lucide-react';
+import { useTheme } from '../hooks/useTheme';
+
+const sections=[
+ ['Information you provide','When you create an account, Nomou may process information such as your name, email address, company name and account credentials. If you use support, you may also provide information in your email or message.'],
+ ['Field and sensor data','Nomou receives sensor readings and related field data needed to provide monitoring, dashboards, alerts, Soil Passport reports and agricultural insights. Sensor channels may include soil moisture, temperature, humidity, pressure, light, CO₂, NH₃ response, TDS, pH and UV depending on the connected node.'],
+ ['Plant photos and Guardian Scan','If you choose Guardian Scan, a selected or captured plant image may be sent to the Nomou analysis service together with available sensor context when you choose to use node data.'],
+ ['Account and service data','The website uses an access token stored in your browser to keep you signed in. Account, subscription, node-request and payment-related records may be processed by Nomou service infrastructure used by the customer portal.'],
+ ['How Nomou uses data','Nomou uses data to operate the website and app, display live readings, generate reports and recommendations, provide account features, improve reliability, and respond to support requests. Nomou is designed to use agricultural data to help users understand plants, crops and field conditions.'],
+ ['Your reports and exports','Reports and exported data generated for your account are intended for your use. You may export supported data from the Nomou app.'],
+ ['Security','Nomou uses HTTPS for its primary cloud API and keeps AI-provider secrets on the server rather than in the client app. No online system can guarantee absolute security, so Nomou continues to treat security and access control as ongoing responsibilities.'],
+ ['Third-party services','Some features may depend on service providers used for authentication, storage, hosting or other platform functions. Those services may process data according to their own terms and privacy practices.'],
+ ['Your choices','You can choose whether to use camera-based plant scanning and whether to include node data with a Guardian scan. You can contact Nomou for privacy or support questions at NomouSupport@gmail.com.'],
+ ['Updates','This policy may be updated as the Nomou platform changes. The current version shown on this website applies to the current website and connected Nomou services.'],
+];
+
+export default function PrivacyPolicy(){
+ const {isDark}=useTheme();const bg=isDark?'bg-[#0a120e]':'bg-[#F7FAF7]';const card=isDark?'bg-white/5 border-white/10':'bg-white border-gray-200';const text=isDark?'text-white':'text-[#0a120e]';const muted=isDark?'text-white/55':'text-gray-600';
+ return <div className={`min-h-screen pt-36 pb-24 px-4 sm:px-6 ${bg} ${text}`}><div className="max-w-4xl mx-auto"><ShieldCheck size={30} className="text-green-primary"/><h1 className="text-4xl sm:text-6xl font-black mt-4">Privacy Policy</h1><p className={`mt-4 ${muted}`}>Effective: 15 November 2026</p><p className={`mt-6 text-lg leading-relaxed ${muted}`}>Nomou is built to help users understand plants, crops and field conditions. We aim to keep the data we use focused on providing those services and to be clear about what the platform does with it.</p><div className="mt-10 space-y-4">{sections.map(([h,b])=><section key={h} className={`p-6 rounded-2xl border ${card}`}><h2 className="font-black text-lg">{h}</h2><p className={`mt-2 text-sm leading-relaxed ${muted}`}>{b}</p></section>)}</div><p className={`mt-8 text-sm ${muted}`}>Privacy questions: <a className="text-green-primary font-bold" href="mailto:NomouSupport@gmail.com">NomouSupport@gmail.com</a></p></div></div>;
+}
