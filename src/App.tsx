@@ -10,6 +10,11 @@ import Contact from './pages/Contact';
 import Pricing from './pages/Pricing';
 import AuthPage from './pages/AuthPage';
 import CheckoutPage from './pages/CheckoutPage';
+import Documentation from './pages/Documentation';
+import ApiReference from './pages/ApiReference';
+import FAQ from './pages/FAQ';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 import PortalLayout from './components/PortalLayout';
 import PortalDashboard from './pages/portal/PortalDashboard';
 import PortalMap from './pages/portal/PortalMap';
@@ -56,6 +61,11 @@ export default function App() {
       <Route path="/research" element={<PageLayout><Research /></PageLayout>} />
       <Route path="/contact" element={<PageLayout><Contact /></PageLayout>} />
       <Route path="/pricing" element={<PageLayout><Pricing /></PageLayout>} />
+      <Route path="/documentation" element={<PageLayout><Documentation /></PageLayout>} />
+      <Route path="/api-reference" element={<PageLayout><ApiReference /></PageLayout>} />
+      <Route path="/faq" element={<PageLayout><FAQ /></PageLayout>} />
+      <Route path="/privacy" element={<PageLayout><PrivacyPolicy /></PageLayout>} />
+      <Route path="/terms" element={<PageLayout><TermsOfService /></PageLayout>} />
     </Routes>
   );
 }
